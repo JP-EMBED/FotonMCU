@@ -25,7 +25,7 @@ static unsigned long GPIO_BASE_REG[]=
 
 
 #define PINS_PER_REG 8
-#define MAX_PIN_NUMBER 19
+#define MAX_PIN_NUMBER 39
 ButtonDriver::ButtonDriver()
  : mButtonFunc(0)
 {
@@ -86,6 +86,7 @@ unsigned int ButtonDriver::gpio2Pin(unsigned char gpio_pin_number)
 	switch(gpio_pin_number)
 	{
 		case  13: return PIN_04;
+		case  22: return PIN_15;
 		default : return 0;
 	}
 }
@@ -103,6 +104,8 @@ bool ButtonDriver::setPinNumber(unsigned char gpio_pin_number)
     Report("Set Pin Number %u with port %x and pin address %x",
     		pin_number, port_address, pin_address);
     mPin.PIN_NUMBER = pin_number;
+    //TODO: Add Clock intialization for GPIO Port requested
+    //TODO: Check if port was already allocated - or move this to ctor
 	PinTypeGPIO(pin_number, PIN_MODE_0,true);
 	GPIODirModeSet(port_address,pin_address,GPIO_DIR_MODE_IN);
 	//PinModeSet(pin_number, PIN_MODE_0);
