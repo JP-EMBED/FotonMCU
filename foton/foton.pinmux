@@ -1,0 +1,1606 @@
+{
+	"deviceId": "CC3200",
+	"partId": "ID_500",
+	"packageId": "ID_0",
+	"deviceRequirements": {
+		"used": true,
+		"solution": {
+			"nameDecoratorText": "",
+			"assignedToName": "",
+			"errorText": "",
+			"warningText": "",
+			"errorDetailsText": [],
+			"warningDetailsText": []
+		},
+		"interfaceRequirementsMap": {
+			"McASP": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [],
+				"requirementsNameIndex": 1
+			},
+			"UART": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My UART 1",
+						"name": "HC-05Bluetooth",
+						"selectedInstance": "UART1",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "UART",
+						"pinRequirements": [
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "RTS",
+								"interfacePinName": "RTS"
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "CTS",
+								"interfacePinName": "CTS"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART1_TX",
+									"assignedToName": "16",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "TX",
+								"interfacePinName": "TX"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART1_RX",
+									"assignedToName": "45",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "RX",
+								"interfacePinName": "RX"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "UART1",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My UART 2",
+						"name": "Serial-Interface",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "UART",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART0_RTS",
+									"assignedToName": "52",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "RTS",
+								"interfacePinName": "RTS"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART0_CTS",
+									"assignedToName": "61",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "CTS",
+								"interfacePinName": "CTS"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART0_TX",
+									"assignedToName": "3",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "TX",
+								"interfacePinName": "TX"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "UART0_RX",
+									"assignedToName": "4",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "RX",
+								"interfacePinName": "RX"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "UART0",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					}
+				],
+				"requirementsNameIndex": 3
+			},
+			"SPI": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [],
+				"requirementsNameIndex": 1
+			},
+			"GPIO": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My GPIO 1",
+						"name": "Bluetooth-Pins",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "GPIO",
+						"pinRequirements": [
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO00",
+								"interfacePinName": "GPIO00",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO01",
+								"interfacePinName": "GPIO01",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO02",
+								"interfacePinName": "GPIO02",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO03",
+								"interfacePinName": "GPIO03",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO04",
+								"interfacePinName": "GPIO04",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO05",
+								"interfacePinName": "GPIO05",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO06",
+								"interfacePinName": "GPIO06",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GPIO07",
+									"assignedToName": "62",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO07",
+								"interfacePinName": "GPIO07",
+								"input": false,
+								"output": true,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO08",
+								"interfacePinName": "GPIO08",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO09",
+								"interfacePinName": "GPIO09",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO10",
+								"interfacePinName": "GPIO10",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO11",
+								"interfacePinName": "GPIO11",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO12",
+								"interfacePinName": "GPIO12",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO13",
+								"interfacePinName": "GPIO13",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GPIO14",
+									"assignedToName": "5",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO14",
+								"interfacePinName": "GPIO14",
+								"input": false,
+								"output": true,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO15",
+								"interfacePinName": "GPIO15",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO16",
+								"interfacePinName": "GPIO16",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO17",
+								"interfacePinName": "GPIO17",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO22",
+								"interfacePinName": "GPIO22",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO23",
+								"interfacePinName": "GPIO23",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO24",
+								"interfacePinName": "GPIO24",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO28",
+								"interfacePinName": "GPIO28",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO29",
+								"interfacePinName": "GPIO29",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO25",
+								"interfacePinName": "GPIO25",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO30",
+								"interfacePinName": "GPIO30",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO31",
+								"interfacePinName": "GPIO31",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							},
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GPIO32",
+								"interfacePinName": "GPIO32",
+								"input": true,
+								"output": false,
+								"outputOpenDrain": false
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "GPIO",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					}
+				],
+				"requirementsNameIndex": 2
+			},
+			"TimerCP": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerCP 1",
+						"name": "AnimationTimer",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerCP",
+						"pinRequirements": [
+							{
+								"used": false,
+								"solution": {
+									"nameDecoratorText": "",
+									"assignedToName": "",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_CCP",
+								"interfacePinName": "GT_CCP"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerCP 4",
+						"name": "AlphaTimer1",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerCP",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_CCP01",
+									"assignedToName": "55",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_CCP",
+								"interfacePinName": "GT_CCP"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerCP1",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerCP 5",
+						"name": "AlphaTimer2",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerCP",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_CCP00",
+									"assignedToName": "50",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_CCP",
+								"interfacePinName": "GT_CCP"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerCP0",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					}
+				],
+				"requirementsNameIndex": 6
+			},
+			"SDHost": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My SDHost 1",
+						"name": "My SDHost 1",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "SDHost",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "SDCARD_IRQ",
+									"assignedToName": "63",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "IRQ",
+								"interfacePinName": "IRQ"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "SDCARD_DATA",
+									"assignedToName": "6",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "DATA",
+								"interfacePinName": "DATA"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "SDCARD_CLK",
+									"assignedToName": "7",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "CLK",
+								"interfacePinName": "CLK"
+							},
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "SDCARD_CMD",
+									"assignedToName": "8",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "CMD",
+								"interfacePinName": "CMD"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "SDHost0",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					}
+				],
+				"requirementsNameIndex": 2
+			},
+			"Camera": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [],
+				"requirementsNameIndex": 1
+			},
+			"I2C": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [],
+				"requirementsNameIndex": 1
+			},
+			"TimerPWM": {
+				"used": true,
+				"solution": {
+					"nameDecoratorText": "",
+					"assignedToName": "",
+					"errorText": "",
+					"warningText": "",
+					"errorDetailsText": [],
+					"warningDetailsText": []
+				},
+				"requirements": [
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 1",
+						"name": "PWMRed1",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM06",
+									"assignedToName": "1",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM6",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 2",
+						"name": "PWMGeen1",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM05",
+									"assignedToName": "64",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM5",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 3",
+						"name": "PWMBlue1",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM07",
+									"assignedToName": "2",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM7",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 4",
+						"name": "PWMRed2",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM02",
+									"assignedToName": "21",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM2",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 5",
+						"name": "PWMBlue2",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM03",
+									"assignedToName": "19",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM3",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					},
+					{
+						"used": true,
+						"solution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"id": "My TimerPWM 6",
+						"name": "PWMGreen2",
+						"selectedInstance": "Any",
+						"selectedVoltage": "Any",
+						"selectedUseCase": "TimerPWM",
+						"pinRequirements": [
+							{
+								"used": true,
+								"solution": {
+									"nameDecoratorText": "GT_PWM00",
+									"assignedToName": "17",
+									"errorText": "",
+									"warningText": "",
+									"errorDetailsText": [],
+									"warningDetailsText": []
+								},
+								"assignedToName": "Any",
+								"type": "Single",
+								"name": "GT_PWM",
+								"interfacePinName": "GT_PWM"
+							}
+						],
+						"peripheralSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "TimerPWM0",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						},
+						"voltageSolution": {
+							"nameDecoratorText": "",
+							"assignedToName": "",
+							"errorText": "",
+							"warningText": "",
+							"errorDetailsText": [],
+							"warningDetailsText": []
+						}
+					}
+				],
+				"requirementsNameIndex": 7
+			}
+		},
+		"devicePinMap": {
+			"1": {
+				"nameDecoratorText": "1",
+				"assignedToName": "GT_PWM06",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMRed1",
+				"requirementId": "My TimerPWM 1",
+				"interfacePin": "GT_PWM"
+			},
+			"2": {
+				"nameDecoratorText": "2",
+				"assignedToName": "GT_PWM07",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMBlue1",
+				"requirementId": "My TimerPWM 3",
+				"interfacePin": "GT_PWM"
+			},
+			"3": {
+				"nameDecoratorText": "3",
+				"assignedToName": "UART0_TX",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Serial-Interface",
+				"requirementId": "My UART 2",
+				"interfacePin": "TX"
+			},
+			"4": {
+				"nameDecoratorText": "4",
+				"assignedToName": "UART0_RX",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Serial-Interface",
+				"requirementId": "My UART 2",
+				"interfacePin": "RX"
+			},
+			"5": {
+				"nameDecoratorText": "5",
+				"assignedToName": "GPIO14",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Bluetooth-Pins",
+				"requirementId": "My GPIO 1",
+				"interfacePin": "GPIO14"
+			},
+			"6": {
+				"nameDecoratorText": "6",
+				"assignedToName": "SDCARD_DATA",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "My SDHost 1",
+				"requirementId": "My SDHost 1",
+				"interfacePin": "DATA"
+			},
+			"7": {
+				"nameDecoratorText": "7",
+				"assignedToName": "SDCARD_CLK",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "My SDHost 1",
+				"requirementId": "My SDHost 1",
+				"interfacePin": "CLK"
+			},
+			"8": {
+				"nameDecoratorText": "8",
+				"assignedToName": "SDCARD_CMD",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "My SDHost 1",
+				"requirementId": "My SDHost 1",
+				"interfacePin": "CMD"
+			},
+			"16": {
+				"nameDecoratorText": "16",
+				"assignedToName": "UART1_TX",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "HC-05Bluetooth",
+				"requirementId": "My UART 1",
+				"interfacePin": "TX"
+			},
+			"17": {
+				"nameDecoratorText": "17",
+				"assignedToName": "GT_PWM00",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMGreen2",
+				"requirementId": "My TimerPWM 6",
+				"interfacePin": "GT_PWM"
+			},
+			"19": {
+				"nameDecoratorText": "19",
+				"assignedToName": "GT_PWM03",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMBlue2",
+				"requirementId": "My TimerPWM 5",
+				"interfacePin": "GT_PWM"
+			},
+			"21": {
+				"nameDecoratorText": "21",
+				"assignedToName": "GT_PWM02",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMRed2",
+				"requirementId": "My TimerPWM 4",
+				"interfacePin": "GT_PWM"
+			},
+			"45": {
+				"nameDecoratorText": "45",
+				"assignedToName": "UART1_RX",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "HC-05Bluetooth",
+				"requirementId": "My UART 1",
+				"interfacePin": "RX"
+			},
+			"50": {
+				"nameDecoratorText": "50",
+				"assignedToName": "GT_CCP00",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "AlphaTimer2",
+				"requirementId": "My TimerCP 5",
+				"interfacePin": "GT_CCP"
+			},
+			"52": {
+				"nameDecoratorText": "52",
+				"assignedToName": "UART0_RTS",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Serial-Interface",
+				"requirementId": "My UART 2",
+				"interfacePin": "RTS"
+			},
+			"55": {
+				"nameDecoratorText": "55",
+				"assignedToName": "GT_CCP01",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "AlphaTimer1",
+				"requirementId": "My TimerCP 4",
+				"interfacePin": "GT_CCP"
+			},
+			"61": {
+				"nameDecoratorText": "61",
+				"assignedToName": "UART0_CTS",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Serial-Interface",
+				"requirementId": "My UART 2",
+				"interfacePin": "CTS"
+			},
+			"62": {
+				"nameDecoratorText": "62",
+				"assignedToName": "GPIO07",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "Bluetooth-Pins",
+				"requirementId": "My GPIO 1",
+				"interfacePin": "GPIO07"
+			},
+			"63": {
+				"nameDecoratorText": "63",
+				"assignedToName": "SDCARD_IRQ",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "My SDHost 1",
+				"requirementId": "My SDHost 1",
+				"interfacePin": "IRQ"
+			},
+			"64": {
+				"nameDecoratorText": "64",
+				"assignedToName": "GT_PWM05",
+				"errorText": "",
+				"warningText": "",
+				"warningDetailsText": [],
+				"errorDetailsText": [],
+				"requirementName": "PWMGeen1",
+				"requirementId": "My TimerPWM 2",
+				"interfacePin": "GT_PWM"
+			}
+		},
+		"verision": "1.0.0"
+	}
+}
