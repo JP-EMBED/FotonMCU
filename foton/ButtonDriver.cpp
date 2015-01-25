@@ -2,39 +2,63 @@
 #include "hw_memmap.h"
 #include "hw_ints.h"
 
+// TODO: REPLACE DEPENDANCY ON GPIO WITH CUSTOM GPIO DRIVER
 #include "gpio.h"
 
 #include "interrupt.h"
 
 #include "uart_if.h"
-#include "button_if.h"
+
 #include "pin.h"
 #include "ButtonDriver.h"
+#include "prcm.h"
+#include "utility_functions.h"
+
+#include "systick.h"
 
 
 
-static unsigned long GPIO_BASE_REG[]=
+// Debounce Task
+void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 {
-    GPIOA0_BASE,
-    GPIOA1_BASE,
-    GPIOA2_BASE,
-    GPIOA3_BASE,
-    GPIOA4_BASE
-};
+	DEBOUNCE_DATA * mydata = (DEBOUNCE_DATA*)debounce_data;
+	vTaskDelay(10/SysTickPeriodGet());
+	taskENTER_CRITICAL();
+
+}
 
 
+void BUTTON_ISR(void)
+{
+	portBASE_TYPE xHigherPriorityTaskWoken;
+	// clear the interrupt for all buttons
+	// check all buttons at once
+	unsigned long button1_state =  GPIOIntStatus(Button1_PTR->mPin.PORT_ADDRESS,1);
+	unsigned long button2_state =  GPIOIntStatus(Button2_PTR->mPin.PORT_ADDRESS,1);
 
-#define PINS_PER_REG 8
-#define MAX_PIN_NUMBER 39
-ButtonDriver::ButtonDriver()
+	// Clear Interrupt flags for both
+	GPIOIntClear(Button1_PTR->mPin.INT_PORT, Button1_PTR->mPin.PIN_ADDRESS || Button2_PTR->mPin.PIN_ADDRESS);
+	if(!Button1_PTR->mStatus.IS_DEBOUNCING & !((button1_state && Button1_PTR->mPin.PIN_ADDRESS) != Button1_PTR->mStatus.BUTTON_STATE )) // Check if Button one changed
+	{
+	//	Button1_PTR->disableInterrupt();
+	//	Button1_PTR->pressButton();
+	}
+//	if(!(button2_state & Button1_PTR->mStatus.BUTTON_STATE)) // Check if Button two changed
+//	{
+
+//	}
+}
+
+
+ButtonDriver::ButtonDriver(unsigned char gpio_pin)
  : mButtonFunc(0)
 {
 	mStatus.BUTTON_STATE = 0;
 	mStatus.RELEASED_COUNT = 0;
 	mStatus.HELD_COUNT = 0;
 	mStatus.PRESSED_COUNT = 0;
-
-
+    setGPIOPinNumber(gpio_pin);
+    buttonpress = NULL;
 }
 
 
@@ -45,6 +69,7 @@ void ButtonDriver::configureFireMode(const ButtonFireMode & firemode)
 
 
 }
+
 
 void ButtonDriver::configureInterrupt(void (*func_ptr)(void),unsigned char edge_type)
 {
@@ -68,55 +93,38 @@ void ButtonDriver::disableInterrupt()
 	GPIOIntDisable(mPin.PORT_ADDRESS,mPin.PIN_ADDRESS);
 	GPIOIntClear(mPin.PORT_ADDRESS,mPin.PIN_ADDRESS);
 	IntDisable(mPin.INT_PORT);
+
 }
 
 
-void ButtonDriver::getPinNumber(unsigned char gpio_pin_number , unsigned int *pin_number, unsigned int *gpio_port_ptr, unsigned char *gpio_pin_ptr)
+bool ButtonDriver::setGPIOPinNumber(unsigned char gpio_pin_number)
 {
-	// Get the GPIO pin from the external Pin number
-	*gpio_pin_ptr = 1 << (gpio_pin_number % PINS_PER_REG);
-    *pin_number = gpio2Pin(gpio_pin_number);
-	// Get the GPIO port from the external Pin number
-	*gpio_port_ptr = (gpio_pin_number / PINS_PER_REG);
-	*gpio_port_ptr = GPIO_BASE_REG[*gpio_port_ptr];
-}
-
-unsigned int ButtonDriver::gpio2Pin(unsigned char gpio_pin_number)
-{
-	switch(gpio_pin_number)
-	{
-		case  13: return PIN_04;
-		case  22: return PIN_15;
-		default : return 0;
-	}
-}
-
-
-bool ButtonDriver::setPinNumber(unsigned char gpio_pin_number)
-{
-	if(gpio_pin_number > MAX_PIN_NUMBER )
+	if(gpio_pin_number > MAX_GPIO_NUMBER )
     	return false;
 	unsigned int  port_address(0);
-	unsigned char pin_address(0);
+	unsigned int  pin_address(0);
 	unsigned int pin_number(0);
 	getPinNumber(gpio_pin_number,&pin_number,&port_address,&pin_address);
 
+	if(pin_number == PIN_ERROR) // Invalid GPIO PIN NUMBER
+		return false;
+
+	// DEBGUG STATEMENT
     Report("Set Pin Number %u with port %x and pin address %x",
     		pin_number, port_address, pin_address);
+
+    mPin.GPIO_PIN_NUM = gpio_pin_number;
     mPin.PIN_NUMBER = pin_number;
-    //TODO: Add Clock intialization for GPIO Port requested
-    //TODO: Check if port was already allocated - or move this to ctor
+    unsigned long prcm_port(getGPIOPRCMPort(port_address));
+
+    // intialize pin
+    PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
 	PinTypeGPIO(pin_number, PIN_MODE_0,true);
 	GPIODirModeSet(port_address,pin_address,GPIO_DIR_MODE_IN);
-	//PinModeSet(pin_number, PIN_MODE_0);
-   // PinDirModeSet(pin_number, PIN_DIR_MODE_IN);
-	//PinConfigSet(pin_number,PIN_STRENGTH_2MA,PIN_TYPE_OD_PD);
+
     mPin.PORT_ADDRESS = port_address;
     mPin.INT_PORT     = getIntPort(mPin.PORT_ADDRESS);
     mPin.PIN_ADDRESS  = pin_address;
-
-
-
     return true;
 }
 

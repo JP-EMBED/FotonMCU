@@ -79,11 +79,11 @@
 #include "pin_mux.h"
 
 #include "HC-05driver.h"
-
+#include "gpio_if.h"
 #include "button_if.h"
 #include "pin.h"
 #include "ButtonDriver.h"
-
+#include "led.h"
 //*****************************************************************************
 //                          MACROS
 //*****************************************************************************
@@ -154,13 +154,19 @@ BoardInit(void)
   PRCMCC3200MCUInit();
 }
 
-ButtonDriver * Button1_PTR;
+
 static void button_func(const ButtonSTATUS & button_data, const bool &button_state)
 {
-	Report("GOT THE INTERRUPT!!!! The Button state is %u", button_state);
+	Report("GOT THE INTERRUPT!!!! Button 1 state is %u",  button_state);
 	Button1_PTR->enableInterrupt();
 }
 
+
+static void button_func2(const ButtonSTATUS & button_data, const bool &button_state)
+{
+	Report("GOT THE INTERRUPT!!!! Button 2 state is %u", button_state);
+	Button2_PTR->enableInterrupt();
+}
 
 
 static void buttonInt()
@@ -172,7 +178,15 @@ static void buttonInt()
 		Button1_PTR->pressButton();
 	}
 }
-
+static void buttonInt2()
+{
+	unsigned long ulPinState =  GPIOIntStatus(Button2_PTR->mPin.PORT_ADDRESS,1);
+	if(ulPinState & Button2_PTR->mPin.PIN_ADDRESS)
+	{
+		Button2_PTR->disableInterrupt();
+		Button2_PTR->pressButton();
+	}
+}
 
 
 //*****************************************************************************
@@ -255,14 +269,25 @@ void main()
 
   //  bluetoothDevice.enable();
 
-    ButtonDriver bdriver;
+    InitializeLEDs(); //Initialize LEDS
+
+    ButtonDriver bdriver(13);
     Button1_PTR = &bdriver;
-    bdriver.setPinNumber(13);
     bdriver.configureInterrupt(&buttonInt,ButtonDriver::BOTH_EDGES);
     ButtonFireMode  firemode;
     firemode.FIRE_MODE = BUTTON_ON_PRESSED;
     bdriver.registerButtonFunc(button_func,firemode);
     bdriver.enableInterrupt();
+
+    // Configure Button one
+    ButtonDriver bdriver2(22);
+    Button2_PTR = &bdriver2;
+    bdriver2.configureInterrupt(&buttonInt2,ButtonDriver::BOTH_EDGES);
+    ButtonFireMode  firemode2;
+    firemode2.FIRE_MODE = BUTTON_ON_PRESSED;
+    bdriver2.registerButtonFunc(button_func2,firemode2);
+    bdriver2.enableInterrupt();
+
 
     //
     // Display Banner

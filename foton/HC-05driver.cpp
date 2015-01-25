@@ -7,9 +7,7 @@
 
 #include "HC-05driver.h"
 
-#include <stdlib.h>
 
-#include "string.h"
 #include "hw_types.h"
 #include "hw_memmap.h"
 #include "hw_gpio.h"
@@ -20,11 +18,11 @@
 #include "rom.h"
 #include "rom_map.h"
 #include "udma.h"
-
-#include "gpio_if.h"
 #include "uart_if.h"
 #include "udma_if.h"
 #include "pin.h"
+
+#include "utility_functions.h"
 
 #define BLUETUTH_BAUD_RATE       1382400
 #define BLUETUTHCLK              80000000
@@ -36,33 +34,6 @@
 
 //HC_05Bluetooth FotonHC_05Bluetooth;
 
-void reverse(char s[])
-{
-    int c, i, j;
-
-    for (i = 0, j = strlen(s)-1; i < strlen(s)-1; i++, j--) {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
-}
-
-
-void itoa(int n, char s[])
-{
-    int i, sign;
-
-    if ((sign = n) >0)  /* record sign */
-        n = -n;          /* make n positive */
-    i = 0;
-    do {       /* generate digits in reverse order */
-        s[i++] = n % 10 + '0';   /* get next digit */
-    } while ((n /= 10) > 0);     /* delete it */
-    if (sign >0)
-        s[i++] = '-';
-    s[i] = '\0';
-    reverse(s);
-}
 
 
 void BlueToothInterruptHandler()
@@ -189,33 +160,48 @@ void BlueToothInterruptHandler()
 
 
 
-HC_05Bluetooth::HC_05Bluetooth()
+HC_05Bluetooth::HC_05Bluetooth(unsigned long RX_pin,unsigned long RX_Mode,
+							   unsigned long TX_pin,unsigned long TX_Mode,
+							   unsigned long RTS_pin,unsigned long RTS_Mode,
+							   unsigned long CONFIG_EN_PIN,unsigned long GPIO_Mode)
 {
 
 
 	// Set up TX and RX pins
-	PinModeSet(PIN_01, PIN_MODE_9);	//Configure pin 9 TX
-	PinDirModeSet(PIN_01, PIN_DIR_MODE_OUT);
-	PinConfigSet(PIN_01,PIN_STRENGTH_4MA,PIN_TYPE_STD_PU);
+	PinTypeUART(TX_pin,TX_Mode);
+	PinTypeUART(RX_pin,RX_Mode);
+	PinTypeUART(RTS_pin,RTS_Mode);
+
+	unsigned int port_address(0);
+	unsigned int pin_address(0);
+	unsigned int pin_number(0);
+	getPinNumber(CONFIG_EN_PIN,&pin_number,&port_address,&pin_address);
+
+	PinTypeGPIO(CONFIG_EN_PIN,GPIO_Mode,false);
+	GPIODirModeSet(port_address,pin_address, GPIO_DIR_MODE_OUT);
+	MAP_PRCMPeripheralClkEnable(PRCM_UARTA1,PRCM_RUN_MODE_CLK);
+	//PinModeSet(RX_pin, RX_Mode);	//TX
+	//PinDirModeSet(RX_pin, PIN_DIR_MODE_IN);
+	//PinConfigSet(RX_pin,PIN_STRENGTH_4MA,PIN_TYPE_STD_PD);
+	//PinDirModeSet(TX_pin, PIN_DIR_MODE_OUT);
+	//PinConfigSet(TX_pin,PIN_STRENGTH_4MA,PIN_TYPE_STD_PU);
 
 	// Configure PIN_10 for UART1 UART1_RX
-	PinModeSet(PIN_02, PIN_MODE_10);	//TX
-	PinDirModeSet(PIN_02, PIN_DIR_MODE_IN);
-	PinConfigSet(PIN_02,PIN_STRENGTH_4MA,PIN_TYPE_STD_PD);
-
 
 
     // Configure PIN_7 for GPIO Output
-	PinModeSet(PIN_62, PIN_MODE_14);
-	PinDirModeSet(PIN_62, PIN_DIR_MODE_OUT);
-	PinConfigSet(PIN_62,PIN_STRENGTH_2MA,PIN_TYPE_OD_PU);
+	//PinModeSet(READ_ENABLE, PIN_MODE_14);
+	//PinDirModeSet(PIN_19, PIN_DIR_MODE_OUT);
+	//PinConfigSet(PIN_19,PIN_STRENGTH_2MA,PIN_TYPE_OD_PU);
 
-	//
+	//PinTypeGPIO(pin_number, PIN_MODE_0,true);
+   // GPIODirModeSet(port_address,pin_address,GPIO_DIR_MODE_IN);
     // Configure PIN_05 for GPIO Output
     //
-	PinModeSet(PIN_05, PIN_MODE_15);
-	PinDirModeSet(PIN_05, PIN_DIR_MODE_OUT);
-	PinConfigSet(PIN_05,PIN_STRENGTH_2MA,PIN_TYPE_OD_PU);
+	//PinModeSet(PIN_62, PIN_MODE_15);
+	//PinDirModeSet(PIN_62, PIN_DIR_MODE_OUT);
+	//PinConfigSet(PIN_62,PIN_STRENGTH_2MA,PIN_TYPE_OD_PU);
+
 	enterTransferMode();
 	setReadMode();
 	MessagesOut[0] ='\0';
@@ -229,7 +215,6 @@ HC_05Bluetooth::HC_05Bluetooth()
 void HC_05Bluetooth::configureDMATransfers()
 {
 	MAP_PRCMPeripheralReset(PRCM_UARTA1);
-	MAP_PRCMPeripheralClkEnable(PRCM_UARTA1,PRCM_RUN_MODE_CLK);
 
 
 	MAP_uDMAChannelAssign(UDMA_CH10_UARTA1_RX);
@@ -293,6 +278,7 @@ void HC_05Bluetooth::configureDMATransfers()
 void HC_05Bluetooth::enable()
 {
 	UARTEnable(UARTA1_BASE);
+	PRCMPeripheralClkEnable(PRCM_UARTA1, PRCM_RUN_MODE_CLK);
 }
 
 void HC_05Bluetooth::enterConfigureMode()

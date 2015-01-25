@@ -33,7 +33,10 @@ class HC_05Bluetooth
 
 public:
 
-	HC_05Bluetooth();
+	HC_05Bluetooth(unsigned long RX_pin,unsigned long RX_Mode,
+			   unsigned long TX_pin,unsigned long TX_Mode,
+			   unsigned long RTS_pin,unsigned long RTS_Mode,
+			   unsigned long CONFIG_EN_PIN,unsigned long GPIO_Mode);
 
 
 	void configureDMATransfers();
