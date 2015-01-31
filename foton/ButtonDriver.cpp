@@ -16,14 +16,29 @@
 
 #include "systick.h"
 
-
-
 // Debounce Task
 void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 {
-	DEBOUNCE_DATA * mydata = (DEBOUNCE_DATA*)debounce_data;
-	vTaskDelay(10/SysTickPeriodGet());
-	taskENTER_CRITICAL();
+    // TODO: Add debounce task initialization
+
+
+	while(1)
+	{
+		if(Button1_PTR->mStatus.IS_DEBOUNCING)
+		{
+			Button1_PTR->mStatus.DEBOUNCE_COUNT += 1;
+			if(Button1_PTR->mStatus.DEBOUNCE_COUNT == 0)
+			{
+				Button1_PTR->mStatus.IS_DEBOUNCING = false;
+				// TODO: Design and Create "Perform task" function
+				// send message to perform function task
+				// Button1_PTR->
+			}
+		}
+		// if button 2
+		vTaskDelay(10/portTICK_PERIOD_MS); // sleep 10 milliseconds
+	}
+	//taskENTER_CRITICAL();
 
 }
 
@@ -38,9 +53,11 @@ void BUTTON_ISR(void)
 
 	// Clear Interrupt flags for both
 	GPIOIntClear(Button1_PTR->mPin.INT_PORT, Button1_PTR->mPin.PIN_ADDRESS || Button2_PTR->mPin.PIN_ADDRESS);
-	if(!Button1_PTR->mStatus.IS_DEBOUNCING & !((button1_state && Button1_PTR->mPin.PIN_ADDRESS) != Button1_PTR->mStatus.BUTTON_STATE )) // Check if Button one changed
+
+	// Check if Button one changed
+	if(!Button1_PTR->mStatus.IS_DEBOUNCING & !((button1_state && Button1_PTR->mPin.PIN_ADDRESS) != Button1_PTR->mStatus.BUTTON_STATE ))
 	{
-	//	Button1_PTR->disableInterrupt();
+
 	//	Button1_PTR->pressButton();
 	}
 //	if(!(button2_state & Button1_PTR->mStatus.BUTTON_STATE)) // Check if Button two changed
@@ -57,6 +74,10 @@ ButtonDriver::ButtonDriver(unsigned char gpio_pin)
 	mStatus.RELEASED_COUNT = 0;
 	mStatus.HELD_COUNT = 0;
 	mStatus.PRESSED_COUNT = 0;
+	mStatus.IS_DEBOUNCING = false;
+	mStatus.DEBOUNCE_COUNT = 0;
+	mFireMode.CTRL_DATA = 0;
+	mFireMode.FIRE_MODE = 0;
     setGPIOPinNumber(gpio_pin);
     buttonpress = NULL;
 }

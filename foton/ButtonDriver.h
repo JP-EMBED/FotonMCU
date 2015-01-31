@@ -31,7 +31,8 @@ typedef struct ButtonSTATUS
 	unsigned int  RELEASED_COUNT : 4;
 	unsigned int  BUTTON_STATE   : 1;
 	unsigned int  IS_DEBOUNCING  : 1;
-	unsigned int  HELD_COUNT     : 6;
+	unsigned int  DEBOUNCE_COUNT : 2;
+	unsigned int  HELD_COUNT     : 4;
 }ButtonSTATUS;
 
 typedef struct ButtonFireMode{
@@ -41,14 +42,15 @@ unsigned char CTRL_DATA      : 5;
 
 
 typedef struct PinDefinition{
-	unsigned int PIN_NUMBER;
-	unsigned int PORT_ADDRESS;
-	unsigned int PIN_ADDRESS;
+	unsigned int  PIN_NUMBER;
+	unsigned int  PORT_ADDRESS;
+	unsigned int  PIN_ADDRESS;
 	unsigned int  GPIO_PIN_NUM;
 	unsigned char INT_MODE : 3;
 	unsigned char INT_PORT : 5;
 }PinDefinition;
 
+// adjust this to be a single struct with debounce data for all buttons
 
 typedef struct DEBOUNCE_STRUCT
 {
@@ -97,8 +99,9 @@ public:
 	unsigned int getCtrlData(){
 		return mFireMode.CTRL_DATA;
 	}
-	void pressButton(){
-		getButtonState();
+	void pressButton(bool isOn){
+		//getButtonState();
+		mStatus.BUTTON_STATE = isOn;
 		mButtonFunc(mStatus, mStatus.BUTTON_STATE);}
 
 	void registerButtonFunc(void (*func_ptr)(const ButtonSTATUS &, const bool &),
@@ -120,6 +123,8 @@ public:
 };
 
 static SemaphoreHandle_t  buttonpress;
+static SemaphoreHandle_t  buttonpress2;
+static TaskHandle_t debounceHandle = NULL;
 
 static ButtonDriver * Button1_PTR;
 static ButtonDriver * Button2_PTR;
