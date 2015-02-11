@@ -58,22 +58,22 @@ void PinMuxConfig(void)
     //
 
 	PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
-	PRCMPeripheralClkEnable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
-	PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
-	PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
-	PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
-	PRCMPeripheralClkEnable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_TIMERA0, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_SDHOST, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_TIMERA1, PRCM_RUN_MODE_CLK);
 
 
 
     // Configure PIN_03 for UART0 UART0_TX
     //
-	PinTypeUART(PIN_55, PIN_MODE_3);
+	//PinTypeUART(PIN_55, PIN_MODE_3);
 
 	//
     // Configure PIN_04 for UART0 UART0_RX
     //
-	PinTypeUART(PIN_57, PIN_MODE_3);
+	//PinTypeUART(PIN_57, PIN_MODE_3);
 
     // Configure PIN_55 for TimerCP1 GT_CCP01
     //
@@ -82,47 +82,47 @@ void PinMuxConfig(void)
 	//
     // Configure PIN_50 for TimerCP0 GT_CCP00
     //
-	PinTypeTimer(PIN_50, PIN_MODE_7);
+	//PinTypeTimer(PIN_50, PIN_MODE_7);
 
 	//
     // Configure PIN_63 for SDHost0 SDCARD_IRQ
     //
-	PinTypeSDHost(PIN_63, PIN_MODE_6);
+	//PinTypeSDHost(PIN_63, PIN_MODE_6);
 
 	//
     // Configure PIN_06 for SDHost0 SDCARD_DATA
     //
-	PinTypeSDHost(PIN_06, PIN_MODE_8);
+	//PinTypeSDHost(PIN_06, PIN_MODE_8);
 
 	//
     // Configure PIN_07 for SDHost0 SDCARD_CLK
     //
-	PinTypeSDHost(PIN_07, PIN_MODE_8);
+	//PinTypeSDHost(PIN_07, PIN_MODE_8);
 
 	//
     // Configure PIN_08 for SDHost0 SDCARD_CMD
     //
-	PinTypeSDHost(PIN_08, PIN_MODE_8);
+	//PinTypeSDHost(PIN_08, PIN_MODE_8);
 
 	//
     // Configure PIN_01 for TimerPWM6 GT_PWM06
     //
-	PinTypeTimer(PIN_01, PIN_MODE_3);
+	//PinTypeTimer(PIN_01, PIN_MODE_3);
 
 	//
     // Configure PIN_64 for TimerPWM5 GT_PWM05
     //
-	PinTypeTimer(PIN_64, PIN_MODE_3);
+	//PinTypeTimer(PIN_64, PIN_MODE_3);
 
 	//
     // Configure PIN_02 for TimerPWM7 GT_PWM07
     //
-	PinTypeTimer(PIN_02, PIN_MODE_3);
+	//PinTypeTimer(PIN_02, PIN_MODE_3);
 
 	//
     // Configure PIN_21 for TimerPWM2 GT_PWM02
     //
-	PinTypeTimer(PIN_21, PIN_MODE_9);
+	//PinTypeTimer(PIN_21, PIN_MODE_9);
 
 	//
     // Configure PIN_19 for TimerPWM3 GT_PWM03

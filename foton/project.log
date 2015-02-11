@@ -1,0 +1,9 @@
+
+!CONFIGURATION: 'com.ti.ccstudio.buildDefinitions.TMS470.Debug.1976651621' [Sat Feb 07 09:54:36 PST 2015]
+
+	!TOOL: 'com.ti.ccstudio.buildDefinitions.TMS470_5.1.exe.compilerDebug.866468803'
+
+		!WARNING: Unresolved option: com.ti.ccstudio.buildDefinitions.TMS470_5.1.compilerID.C_DIALECT
+
+		!WARNING: Unresolved option: com.ti.ccstudio.buildDefinitions.TMS470_5.1.compilerID.C___DIALECT
+

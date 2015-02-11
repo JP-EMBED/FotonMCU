@@ -18,11 +18,21 @@
 #define ONBOARD_LED   PinDefinition
 
 
-static ONBOARD_LED YELLOW_LED;
+extern ONBOARD_LED * YELLOW_LEDPTR;
 
+extern ONBOARD_LED * RED_LEDPTR;
+
+extern ONBOARD_LED * GREEN_LEDPTR;
+
+static ONBOARD_LED YELLOW_LED;
+static ONBOARD_LED GREEN_LED;
 static ONBOARD_LED RED_LED;
 
-static ONBOARD_LED GREEN_LED;
+ONBOARD_LED * YELLOW_LEDPTR = &YELLOW_LED;
+
+ONBOARD_LED * RED_LEDPTR = &RED_LED;
+
+ONBOARD_LED * GREEN_LEDPTR = &GREEN_LED;
 
 void ConfigureLED(ONBOARD_LED &led, unsigned char ucPin)
 {
@@ -57,8 +67,8 @@ static void Toggle_LED(ONBOARD_LED led)
 static void InitializeLEDs()
 {
 	// Configure the LED Pin Definitions for GPIO 9, 10, and 11
-	ConfigureLED(YELLOW_LED, 9);
-	ConfigureLED(RED_LED, 10);
+	ConfigureLED(YELLOW_LED, 10);
+	ConfigureLED(RED_LED,9);
 	ConfigureLED(GREEN_LED, 11);
 
 	// LEDs are all on same GPIO_PORT so only need this for one

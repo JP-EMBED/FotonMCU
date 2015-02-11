@@ -9,11 +9,25 @@
 #define BUTTONDRIVER_H_
 
 
+#include "hw_types.h"
+#include "hw_memmap.h"
+#include "hw_gpio.h"
+#include "hw_uart.h"
+#include "uart.h"
 #include "gpio.h"
+#include "prcm.h"
+#include "rom.h"
+#include "rom_map.h"
+#include "udma.h"
+#include "uart_if.h"
+#include "udma_if.h"
+#include "pin.h"
+
+#include "utility_functions.h"
+
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <task.h>
-#include <semphr.h>
 
 // BUTTON FIRE_MODES
 #define BUTTON_IGNORE            00  // Ignore all things related to button
@@ -30,15 +44,24 @@ typedef struct ButtonSTATUS
 	unsigned int  PRESSED_COUNT  : 4;
 	unsigned int  RELEASED_COUNT : 4;
 	unsigned int  BUTTON_STATE   : 1;
-	unsigned int  IS_DEBOUNCING  : 1;
-	unsigned int  DEBOUNCE_COUNT : 2;
-	unsigned int  HELD_COUNT     : 4;
+	unsigned int  HELD_COUNT     : 7;
 }ButtonSTATUS;
 
-typedef struct ButtonFireMode{
-unsigned char FIRE_MODE      : 3;
-unsigned char CTRL_DATA      : 5;
-}ButtonFireMode;
+typedef struct BUTTON_DEBOUNCE_CTRL
+{
+	unsigned int  IS_DEBOUNCING  : 1;
+	unsigned int  DEBOUNCE_COUNT : 2;
+	unsigned int  CURRENT_STATE  : 1;
+	unsigned int  EXPECTED_STATE : 1;
+	unsigned int  FIRE_MODE      : 3;
+	unsigned int  CTRL_DATA      : 8;
+	BUTTON_DEBOUNCE_CTRL()
+		:IS_DEBOUNCING(false),DEBOUNCE_COUNT(0),
+		 CURRENT_STATE(false),EXPECTED_STATE(false),
+		 FIRE_MODE(BUTTON_IGNORE),CTRL_DATA(0)
+	{	}
+
+}BUTTON_DEBOUNCE_CTRL;
 
 
 typedef struct PinDefinition{
@@ -48,17 +71,20 @@ typedef struct PinDefinition{
 	unsigned int  GPIO_PIN_NUM;
 	unsigned char INT_MODE : 3;
 	unsigned char INT_PORT : 5;
+	PinDefinition()
+			:PIN_NUMBER(0),PORT_ADDRESS(0),
+			 PIN_ADDRESS(0),GPIO_PIN_NUM(255),
+			 INT_MODE(0),INT_PORT(0)
+		{}
 }PinDefinition;
 
 // adjust this to be a single struct with debounce data for all buttons
 
-typedef struct DEBOUNCE_STRUCT
+typedef struct CALLBACK_STRUCT
 {
-    short TARGET_BUTTON;
-    short TARGET_RESULT;
     void (*PRESSED_CALLBACK)(short,short);
     void (*RELEASED_CALLBACK)(short,short);
-}DEBOUNCE_DATA;
+}CALLBACK_DATA;
 
 
 
@@ -67,7 +93,7 @@ class ButtonDriver {
 protected:
 	// place holder function pointer. Register a function to be called when a button is pressed.
 	void 		      (*mButtonFunc)(const ButtonSTATUS & button_data, const bool &button_state);
-	void configureFireMode(const ButtonFireMode & firemode);
+	void configureDebounce(const BUTTON_DEBOUNCE_CTRL & debounce);
     //bool setPinNumber(unsigned char pin_number);
     bool setGPIOPinNumber(unsigned char pin_number);
 public:
@@ -85,7 +111,7 @@ public:
 	unsigned int getFireMode()
 	{
 		unsigned int fire_mode(0);
-		fire_mode &= mFireMode.FIRE_MODE;
+		//fire_mode &= mFireMode.FIRE_MODE;
 		return fire_mode;
 	}
 
@@ -97,18 +123,16 @@ public:
 		return mStatus.HELD_COUNT;}
 
 	unsigned int getCtrlData(){
-		return mFireMode.CTRL_DATA;
+		return 0;//mFireMode.CTRL_DATA;
 	}
-	void pressButton(bool isOn){
-		//getButtonState();
-		mStatus.BUTTON_STATE = isOn;
+	void pressButton(){
 		mButtonFunc(mStatus, mStatus.BUTTON_STATE);}
 
 	void registerButtonFunc(void (*func_ptr)(const ButtonSTATUS &, const bool &),
-			                const ButtonFireMode & fire_mode)
+			                const BUTTON_DEBOUNCE_CTRL & debounce)
 	{
 		mButtonFunc = func_ptr;
-		configureFireMode(fire_mode);
+		configureDebounce(debounce);
 	}
 
 	~ButtonDriver();
@@ -118,20 +142,20 @@ public:
 	static const unsigned char RISING_EDGE  = GPIO_RISING_EDGE;
 	static const unsigned char BOTH_EDGES   = GPIO_BOTH_EDGES;
 	ButtonSTATUS     	mStatus;
-	ButtonFireMode 	    mFireMode;
 	PinDefinition       mPin;
 };
 
-static SemaphoreHandle_t  buttonpress;
-static SemaphoreHandle_t  buttonpress2;
-static TaskHandle_t debounceHandle = NULL;
+extern TaskHandle_t DEBOUNCE_TSK_HNDLE;
 
-static ButtonDriver * Button1_PTR;
-static ButtonDriver * Button2_PTR;
+extern ButtonDriver * Button1_PTR;
+extern ButtonDriver * Button2_PTR;
 
-static void BUTTON_DEBOUNCE_TASK(void * debounce_data);
+extern BUTTON_DEBOUNCE_CTRL Button1_Debounce;
+extern BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
-static void BUTTON_ISR(void);
+extern void BUTTON_DEBOUNCE_TASK(void * debounce_data);
+
+extern void BUTTON_ISR(void);
 
 
 
