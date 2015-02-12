@@ -27,82 +27,92 @@
 #define BLUETUTH_BAUD_RATE      1382400
 #define COMMAND_BAUD_RATE       38400
 #define BLUETUTHCLK             80000000
-#define BLUETOOTH               UARTA1_BASE
-#define BLUETOOTH_PERIPH        PRCM_UARTA1
+#define BLUETOOTH               UARTA0_BASE
+#define BLUETOOTH_PERIPH        PRCM_UARTA0
 #define SYSTICKS_PER_SECOND     100
 #define BUFF_SIZE               20
-
+#define HI_MASK                 5
+#define LOW_MASK                31
 
 //HC_05Bluetooth FotonHC_05Bluetooth;
 
-
-
+void BluetoothReadTask(void * nothing)
+{
+	while(1)
+	{
+		int index(0);
+		if((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
+		{
+			while(index < 40 && (FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
+			{
+				// PROCESS BYTE BY BYTE
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+					FOTON_BLUETOOTH->FrontIndex = 0;
+				FOTON_BLUETOOTH->processNextByte(FOTON_BLUETOOTH->mMessageBuffer[FOTON_BLUETOOTH->FrontIndex]);
+				++FOTON_BLUETOOTH->FrontIndex;
+			}
+			UARTIntEnable(BLUETOOTH, UART_INT_DMARX);
+			UARTDMAEnable(BLUETOOTH, UART_DMA_RX);
+		}
+		vTaskDelay(30 * portTICK_PERIOD_MS); // sleep 30 milliseconds
+	}
+}
 
 
 void BlueToothInterruptHandler()
 {
+	if(UARTCharsAvail(BLUETOOTH))
+	{
+		while(UARTCharsAvail(BLUETOOTH))
+		{
+			// GRAB FROM FIFO UNTIL IT IS EMPTY
+			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
+				FOTON_BLUETOOTH->BackIndex = 0;
+			FOTON_BLUETOOTH->mMessageBuffer[FOTON_BLUETOOTH->BackIndex] = UARTCharGetNonBlocking(BLUETOOTH);
+			++FOTON_BLUETOOTH->BackIndex;
 
-	unsigned long ulStatus;
+		}
+		UARTIntDisable(BLUETOOTH, UART_INT_DMARX);
+		UARTDMADisable(BLUETOOTH, UART_DMA_RX);
+	}
+    UARTIntClear(BLUETOOTH,UART_INT_DMARX);
+    UARTRxErrorClear(BLUETOOTH);
 
-	//unsigned long ulMode;
-	    //
-	    // Read the interrupt status of the UART.
-	    //
-	ulStatus = MAP_UARTIntStatus(BLUETOOTH, 1);
-	UARTIntClear(BLUETOOTH,ulStatus);
-
-	UARTIntEnable(BLUETOOTH,UART_INT_RX);
-
-	  /*  if(!bRxDone)
-	    {
-	        MAP_UARTDMADisable(UARTA0_BASE,UART_DMA_RX);
-	        bRxDone = true;
-	    }
-	    else
-	    {
-	        MAP_UARTDMADisable(UARTA0_BASE,UART_DMA_TX);
-	    }
-
-	    MAP_UARTIntClear(UARTA0_BASE,UART_INT_DMATX|UART_INT_DMARX);*/
 
 }
 
 
 
 
-HC_05Bluetooth::HC_05Bluetooth(unsigned long RX_pin,unsigned long RX_Mode,
-							   unsigned long TX_pin,unsigned long TX_Mode,
-							   unsigned long CTS_pin,unsigned long CTS_Mode,
-							   unsigned long STATE_pin,unsigned long GPIO_Mode)
-	: mEnabled(false)
+HC_05Bluetooth::HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
+							   unsigned char TX_pin,unsigned long TX_Mode,
+							   unsigned char CTS_pin,unsigned long CTS_Mode,
+							   unsigned char STATE_pin,unsigned long GPIO_Mode)
+	: mEnabled(false),FrontIndex(0),BackIndex(0),mPARSE_STATE(START)
 {
-
+	PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
 	// Set up TX and RX pins
 	PinTypeUART(TX_pin,TX_Mode);
 	PinTypeUART(RX_pin,RX_Mode);
 
 	getPinNumber(STATE_pin,&mStatePinNumber,&mStatePortAddress,&mStatePinAddress);
 	unsigned long prcm_port(getGPIOPRCMPort(mStatePortAddress));
-	PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
-	PinTypeGPIO(mStatePinNumber, GPIO_Mode,false);
-	GPIODirModeSet(mStatePortAddress,mStatePinAddress,GPIO_DIR_MODE_OUT);
 
+	PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
+	waitForModeChange();
+	PinTypeGPIO(mStatePinNumber, GPIO_Mode, false);
 	getPinNumber(CTS_pin, &mCTSPinNumber, &mCTSPortAddress, &mCTSPinAddress);
 	prcm_port = getGPIOPRCMPort(mCTSPortAddress);
 	PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
-	PinTypeGPIO(mCTSPinNumber, CTS_Mode,false);
-	GPIODirModeSet(mCTSPortAddress,mCTSPinAddress,GPIO_DIR_MODE_OUT);
-
-	GPIOPinWrite(mStatePortAddress,mStatePinNumber,0);
-	GPIOPinWrite(mCTSPortAddress,mCTSPinNumber,0);
-	PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
 
 
-		// set clock speed back to 1382400
-	UARTConfigSetExpClk(BLUETOOTH,MAP_PRCMPeripheralClockGet(BLUETOOTH_PERIPH),BLUETUTH_BAUD_RATE,
-		               (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
-	configureDMATransfers();
-	enable();
+	waitForModeChange();
+	PinTypeGPIO(mCTSPinNumber, CTS_Mode, false);
+
+
+
+    enterTransferMode();
+    GPIOPinWrite(mCTSPortAddress,mCTSPinAddress, 0);
 	FrontIndex = 0;
 	BackIndex = 0;
 	MessageCount = 0;
@@ -112,20 +122,20 @@ HC_05Bluetooth::HC_05Bluetooth(unsigned long RX_pin,unsigned long RX_Mode,
 
 void HC_05Bluetooth::configureDMATransfers()
 {
-
-	uDMAChannelAssign(UDMA_CH10_UARTA1_RX);
-	uDMAChannelAssign(UDMA_CH11_UARTA1_TX);
+	UDMAInit();
+	uDMAChannelAssign(UDMA_CH8_UARTA0_RX);
+	uDMAChannelAssign(UDMA_CH9_UARTA0_TX);
 
 
 
 	UARTIntRegister(BLUETOOTH,BlueToothInterruptHandler);
 
-	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX6_8, UART_FIFO_RX6_8);
 
-	//UARTIntEnable(BLUETOOTH,UART_INT_DMATX);
+	//UARTIntEnable(BLUETOOTH,UART_INT_TX);
 	UARTIntEnable(BLUETOOTH,UART_INT_DMARX);
 
-    UARTDMAEnable(UARTA1_BASE, UART_DMA_RX | UART_DMA_TX);
+    UARTDMAEnable(BLUETOOTH, UART_DMA_RX);
 }
 
 
@@ -145,7 +155,6 @@ void HC_05Bluetooth::disable()
 	if(mEnabled)
 	{
 		UARTDisable(BLUETOOTH);
-		PRCMPeripheralClkDisable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
 		UARTFIFODisable(BLUETOOTH);
 		mEnabled = false;
 	}
@@ -153,34 +162,90 @@ void HC_05Bluetooth::disable()
 
 void HC_05Bluetooth::enterConfigureMode()
 {
-	// Enter AT Command mode signal to HC-05 (assume connected to KEY/STATE pin on HC-05)
-	GPIOPinWrite(mStatePortAddress,mStatePinNumber,mStatePinAddress);
+	//disable();
+	// Enter AT Command mode signal to HC-05 (assume connected to KEY/STATE pin on HC-05)	//PinConfigSet(mStatePinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD_PU);
+	GPIOPinWrite(mStatePortAddress,mStatePinAddress, 1);
+	waitForModeChange();
 
 	// set baud to 38400
-	UARTConfigSetExpClk(BLUETOOTH,MAP_PRCMPeripheralClockGet(BLUETOOTH_PERIPH),
-		COMMAND_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-		UART_CONFIG_PAR_NONE));
+	//UARTConfigSetExpClk(BLUETOOTH,MAP_PRCMPeripheralClockGet(BLUETOOTH_PERIPH),
+	//	COMMAND_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+	//	UART_CONFIG_PAR_NONE));
+	//enable();
 
-	waitForModeChange();
+
 }
 
 
 void HC_05Bluetooth::waitForModeChange()
 {
 	// wait some time for the HC-05 to catch up on mode change
-	for(int i = 0; i < 40; ++i)
+	for(int i = 0; i < 50; ++i)
 		asm(" nop");
 }
 
 void HC_05Bluetooth::enterTransferMode()
 {
-	GPIOPinWrite(mStatePortAddress,mStatePinNumber,0);
-
+	//disable();
+	GPIOPinWrite(mStatePortAddress,mStatePinAddress, 0);
+	//PinConfigSet(mStatePinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD_PD);
+	waitForModeChange();
 	// set clock speed back to 1382400
 	UARTConfigSetExpClk(BLUETOOTH,MAP_PRCMPeripheralClockGet(BLUETOOTH_PERIPH),BLUETUTH_BAUD_RATE,
 	                       (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
-	waitForModeChange();
+	//enable();
+
+
+}
+
+
+void HC_05Bluetooth::processNextByte(char byte)
+{
+	switch(mPARSE_STATE)
+	{
+		case START:
+		{
+			mPARSE_STATE = FUNCTION_MJR;
+			break;
+		}
+		case FUNCTION_MJR:
+		{
+
+			CURRENT_MESSAGE->FUNC_MJR = (byte >> HI_MASK);
+			CURRENT_MESSAGE->ROW = (byte &LOW_MASK);
+			mPARSE_STATE = FUNCTION_MNR;
+			break;
+		}
+		case FUNCTION_MNR:
+		{
+			CURRENT_MESSAGE->FUNC_MNR = (byte >> HI_MASK);
+			CURRENT_MESSAGE->COL = (byte & LOW_MASK);
+			mPARSE_STATE = RED;
+			break;
+		}
+		case RED:
+		{
+			CURRENT_MESSAGE->RED = byte;
+			mPARSE_STATE = GREEN;
+			break;
+		}
+		case GREEN:
+		{
+			CURRENT_MESSAGE->GREEN = byte;
+			mPARSE_STATE = BLUE;
+			break;
+		}
+		case BLUE:
+		{
+			CURRENT_MESSAGE->BLUE = byte;
+			// perform or put the command into action
+			//LEDBoard->ledSet(CURRENT_MESSAGE);
+			mPARSE_STATE = START;
+			break;
+		}
+		default:{break;}
+	}
 }
 
 
@@ -192,16 +257,15 @@ void HC_05Bluetooth::sendMessage(const char * message,unsigned int length)
 		UARTCharPut(BLUETOOTH,message[i]);
 	}
 
-/*	SetupTransfer(UDMA_CH11_UARTA1_TX| UDMA_PRI_SELECT,
-	           UDMA_MODE_BASIC, length,UDMA_SIZE_8, UDMA_ARB_4,
-	           message, UDMA_SRC_INC_8,(void *)(UARTA1_BASE + UART_O_DR),
-	                                                UDMA_DST_INC_NONE);*/
+
 }
 
 
 void HC_05Bluetooth::setReadMode()
 {
-    GPIOPinWrite(mCTSPortAddress,mCTSPinNumber,mCTSPinAddress);
+	//PinConfigSet(mCTSPinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD_PU);
+	GPIOPinWrite(mCTSPortAddress,mCTSPinAddress, 1);
+	waitForModeChange();
 
 }
 
@@ -209,7 +273,9 @@ void HC_05Bluetooth::setReadMode()
 
 void HC_05Bluetooth::setWriteMode()
 {
-	GPIOPinWrite(mCTSPortAddress,mCTSPinNumber,0);
+	//PinConfigSet(mCTSPinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD);
+	GPIOPinWrite(mCTSPortAddress,mCTSPinAddress, 0);
+	waitForModeChange();
 }
 
 

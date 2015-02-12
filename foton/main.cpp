@@ -86,7 +86,7 @@ BoardInit(void)
 
 
 TaskHandle_t       DEBOUNCE_TSK_HNDLE;
-
+TaskHandle_t       BLUETOOTH_READ_HNDLE;
 ButtonDriver * Button1_PTR;
 ButtonDriver * Button2_PTR;
 
@@ -95,16 +95,17 @@ static ButtonDriver button2(22);
 /*
  * Bluetooth (HC-05)
  * Board Pin	Function	GPIO Pin Alias	Pin Mode Config	Peripheral Pin	Foton Alias
- * PIN_59	 When pulled high, notifies HC-05 Ready_Read RX		GPIO_04	0	LED	BLUETOOTH_READ_ENABLE
+ * PIN_59	 When pulled high, notifies HC-05 Ready_Read RX		GPIO_03	0	LED	BLUETOOTH_READ_ENABLE
  * PIN_18	 Changes HC-05 between configure and transmit mode.	GPIO_28	0	KEY	BLUETOOTH_STATE_ENABLE
  * PIN_55	 Data line for Bluetooth Tx							GPIO_01	5	RXD	BLUETOOTH_TX
  * PIN_57	 Data line for Bluetooth Rx							GPIO_02	5	TXD	BLUETOOTH_RX
  *
  */
 
-static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_6,PIN_55,PIN_MODE_6,4,0,28,0);
+static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_3,PIN_55,PIN_MODE_3,3,PIN_MODE_0,28,PIN_MODE_0);
 HC_05Bluetooth * FOTON_BLUETOOTH;
-
+static FOTON_LED_MESSAGE local_current_message;
+FOTON_LED_MESSAGE * CURRENT_MESSAGE;
 BUTTON_DEBOUNCE_CTRL Button1_Debounce;
 BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
@@ -203,6 +204,9 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
 
 
 
+
+
+
 void main()
 {
     //
@@ -210,12 +214,12 @@ void main()
     //
     BoardInit();
 
-    //bRxDone = false;
+
 
     //
     // Initialize uDMA
     //
-    UDMAInit();
+
 
     //
     // Muxing for Enabling UART_TX and UART_RX.
@@ -227,9 +231,13 @@ void main()
     //
     ClearTerm();
 
-    //FOTON_BLUETOOTH = &bluetooth;
-    //Message("Initializing Bluetooth Device");
+    CURRENT_MESSAGE = &local_current_message;
+    FOTON_BLUETOOTH = &bluetooth;
+    Report("Initializing Bluetooth Device");
 
+
+   // bluetooth.enterTransferMode();
+    bluetooth.configureDMATransfers();
 
 
     InitializeLEDs(); //Initialize LEDS
@@ -247,15 +255,17 @@ void main()
     button2.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
     button2.registerButtonFunc(button_func2,debounce);
     button2.enableInterrupt();
-    VStartSimpleLinkSpawnTask(8);
+    VStartSimpleLinkSpawnTask(3);
 
     osi_TaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 1, &DEBOUNCE_TSK_HNDLE);
+    osi_TaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 1, &BLUETOOTH_READ_HNDLE);
 
     // attempt to use bluetooth
+  //  bluetooth.enterConfigureMode();
+    //bluetooth.setReadMode();
+    bluetooth.sendMessage("at+version?\r\n",16);
    // bluetooth.setWriteMode();
-   // bluetooth.sendMessage("This is a text message",22);
-   // bluetooth.setReadMode();
-   // bluetooth.enterConfigureMode();
+
     osi_start();
     return;
 }

@@ -160,8 +160,8 @@ bool ButtonDriver::setGPIOPinNumber(unsigned char gpio_pin_number)
 	if(gpio_pin_number > MAX_GPIO_NUMBER )
     	return false;
 	unsigned long  port_address(0);
-	unsigned long  pin_address(0);
-	unsigned int pin_number(0);
+	unsigned char  pin_address(0);
+	unsigned char pin_number(0);
 	getPinNumber(gpio_pin_number,&pin_number,&port_address,&pin_address);
 
 	if(pin_number == PIN_ERROR) // Invalid GPIO PIN NUMBER

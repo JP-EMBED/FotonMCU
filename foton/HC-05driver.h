@@ -15,11 +15,34 @@
 #define STATE_PIN PIN_18 // 17
 
 #define MAX_NAME_LENGTH 90
-
+#define MAX_COMMAND_INDEX 300
 #include "hw_types.h"
 #include "udma.h"
 #include "FreeRTOS.h"
 #include "ButtonDriver.h"
+
+
+typedef struct FOTON_LED_MESSAGE
+{
+    unsigned char FUNC_MJR : 3;
+    unsigned char ROW      : 5;
+    unsigned char FUNC_MNR : 3;
+    unsigned char COL      : 5;
+    unsigned char RED      : 8;
+    unsigned char GREEN    : 8;
+    unsigned char BLUE     : 8;
+}FOTON_LED_MESSAGE;
+
+
+enum HC_05_PARSE_STATES
+{
+	START = 0,
+	FUNCTION_MJR,
+	FUNCTION_MNR,
+	RED,
+	GREEN,
+	BLUE
+};
 
 //#include "queue.h"
 
@@ -89,10 +112,10 @@ class HC_05Bluetooth
 
 public:
 
-	HC_05Bluetooth(unsigned long RX_pin,unsigned long RX_Mode,
-			   unsigned long TX_pin,unsigned long TX_Mode,
-			   unsigned long RTS_pin,unsigned long RTS_Mode,
-			   unsigned long CONFIG_EN_PIN,unsigned long GPIO_Mode);
+	HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
+			   unsigned char TX_pin,unsigned long TX_Mode,
+			   unsigned char RTS_pin,unsigned long RTS_Mode,
+			   unsigned char CONFIG_EN_PIN,unsigned long GPIO_Mode);
 
 
 	void configureDMATransfers();
@@ -102,7 +125,7 @@ public:
 	void enterConfigureMode(void);
 	void enterTransferMode(void);
 	void sendMessage(const char * message, unsigned int length);
-
+	void processNextByte(char byte);
 	// Bluetooth AT Config Commands Specific to the HC-05 bluetooth
 	void setATCommand(const char * command){
 		WaitingForResponse = true;
@@ -164,28 +187,27 @@ public:
 	void setWriteMode(void);
 
 	~HC_05Bluetooth();
-
+	unsigned short  FrontIndex;
+	unsigned short  BackIndex;
+	char            mMessageBuffer[MAX_COMMAND_INDEX];
 private:
 	void waitForModeChange(void);
 
-	unsigned short  InputDevice;
-	unsigned short  OutputDevice;
-	unsigned short  FrontIndex;
-	unsigned short  BackIndex;
 	unsigned short  MessageCount;
 	bool            WaitingForResponse;
     bool            mEnabled;
+    HC_05_PARSE_STATES mPARSE_STATE;
 	unsigned long mStatePortAddress;
-	unsigned int  mStatePinNumber;
-	unsigned long mStatePinAddress;
-	unsigned int  mCTSPinNumber;
+	unsigned char mStatePinNumber;
+	unsigned char mStatePinAddress;
+	unsigned char mCTSPinNumber;
 	unsigned long mCTSPortAddress;
-	unsigned long mCTSPinAddress;
+	unsigned char mCTSPinAddress;
 
 };
 
 
 extern HC_05Bluetooth *  FOTON_BLUETOOTH;
-
-
+extern void BluetoothReadTask(void *);
+extern FOTON_LED_MESSAGE * CURRENT_MESSAGE;
 #endif /* HC_05DRIVER_HPP_ */

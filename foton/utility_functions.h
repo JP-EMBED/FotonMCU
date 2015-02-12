@@ -59,6 +59,8 @@ static unsigned int GPIO2Pin(unsigned char gpio_pin_number)
 		case  22: return PIN_15;
 		case  28: return PIN_18;
 		case   3: return PIN_58;
+		case   4: return PIN_59;
+		case   8: return PIN_62;
 		default : return PIN_ERROR;
 	}
 }
@@ -77,7 +79,7 @@ static void PinTypeLED(unsigned long ulPin,unsigned long ulPinMode)
 }
 
 
-static void getPinNumber(unsigned int gpio_pin_number , unsigned int *pin_number, unsigned long  *gpio_port_ptr, unsigned long *gpio_pin_ptr)
+static void getPinNumber(unsigned char gpio_pin_number , unsigned char *pin_number, unsigned long  *gpio_port_ptr, unsigned char *gpio_pin_ptr)
 {
 	// Get the GPIO pin from the external Pin number
 	*pin_number = GPIO2Pin(gpio_pin_number);
