@@ -39,7 +39,6 @@
 #define APP_NAME                "Foton_FW"
 #define SYSTICKS_PER_SECOND     100
 #define BUFF_SIZE               20
-#define OSI_STACK_SIZE          1024
 #define SYSTICK_RELOAD_VALUE    0x0000C3500
 #define UART_PRINT              Report
 //*****************************************************************************
@@ -95,14 +94,14 @@ static ButtonDriver button2(22);
 /*
  * Bluetooth (HC-05)
  * Board Pin	Function	GPIO Pin Alias	Pin Mode Config	Peripheral Pin	Foton Alias
- * PIN_59	 When pulled high, notifies HC-05 Ready_Read RX		GPIO_03	0	LED	BLUETOOTH_READ_ENABLE
- * PIN_18	 Changes HC-05 between configure and transmit mode.	GPIO_28	0	KEY	BLUETOOTH_STATE_ENABLE
+ * PIN_18	 When pulled high, notifies HC-05 Ready_Read RX		GPIO_28	0	LED	BLUETOOTH_READ_ENABLE
+ * PIN_05	 Changes HC-05 between configure and transmit mode.	GPIO_03	0	KEY	BLUETOOTH_STATE_ENABLE
  * PIN_55	 Data line for Bluetooth Tx							GPIO_01	5	RXD	BLUETOOTH_TX
  * PIN_57	 Data line for Bluetooth Rx							GPIO_02	5	TXD	BLUETOOTH_RX
  *
  */
 
-static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_3,PIN_55,PIN_MODE_3,3,PIN_MODE_0,28,PIN_MODE_0);
+static HC_05Bluetooth  bluetooth(PIN_02,PIN_MODE_7,PIN_01,PIN_MODE_7,28,PIN_MODE_0,14,PIN_MODE_0);
 HC_05Bluetooth * FOTON_BLUETOOTH;
 static FOTON_LED_MESSAGE local_current_message;
 FOTON_LED_MESSAGE * CURRENT_MESSAGE;
@@ -111,11 +110,7 @@ BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
 
 
-//static void vAssertCalled(const char *pcFile, unsigned long ulLine );
-//static void vApplicationIdleHook( void);
-//static void vApplicationMallocFailedHook();
-//static void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
-//                                   signed char *pcTaskName);
+
 //*****************************************************************************
 // FreeRTOS User Hook Functions enabled in FreeRTOSConfig.h
 //*****************************************************************************
@@ -187,17 +182,29 @@ extern "C" void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
     }
 }
 
+
+
+
 static void button_func(const ButtonSTATUS & button_data, const bool &button_state)
 {
 	//Report("GOT THE BUTTON SIGNAL FROM FREE RTOS TASK!!!! Button 1 state is %u",  button_state);
-	Toggle_LED(GREEN_LED);
+	if(button_state)
+		FOTON_BLUETOOTH->sendMessage("Button one pressed.",18);
+	else
+		FOTON_BLUETOOTH->sendMessage("Button one released.",18);
+
+	//Toggle_LED(GREEN_LED);
 }
 
 
 static void button_func2(const ButtonSTATUS & button_data, const bool &button_state)
 {
 	//Report("GOT THE INTERRUPT!!!! Button 2 state is %u", button_state);
-	Toggle_LED(YELLOW_LED);
+	if(button_state)
+		FOTON_BLUETOOTH->sendMessage("Button two pressed.",18);
+	else
+		FOTON_BLUETOOTH->sendMessage("Button two released.",18);
+	//Toggle_LED(YELLOW_LED);
 }
 
 
@@ -213,7 +220,7 @@ void main()
     // Initailizing the board
     //
     BoardInit();
-
+	UDMAInit();
 
 
     //
@@ -227,46 +234,58 @@ void main()
     PinMuxConfig();
     //
 
+    InitTerm();
+
+   // bluetooth.enterTransferMode();
+
+    //bluetooth.enableDMA();
+    bluetooth.setLiveMode();
+    bluetooth.enable();
+
     // Clear terminal
     //
     ClearTerm();
 
     CURRENT_MESSAGE = &local_current_message;
     FOTON_BLUETOOTH = &bluetooth;
-    Report("Initializing Bluetooth Device");
 
 
-   // bluetooth.enterTransferMode();
-    bluetooth.configureDMATransfers();
+
+   // Report("Initializing Bluetooth Device");
 
 
-    InitializeLEDs(); //Initialize LEDS
+
+   // InitializeLEDs(); //Initialize LEDS
 
     // Configure Button one
     Button1_PTR = &button1;
     button1.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
     BUTTON_DEBOUNCE_CTRL  debounce;
-    debounce.FIRE_MODE = BUTTON_ON_PRESSED;
-    button1.registerButtonFunc(button_func,debounce);
+    debounce.FIRE_MODE = BUTTON_ON_PRESSED_X;
+    debounce.CTRL_DATA = 3;
+    button1.registerButtonFunc(button_func);
+    ButtonDriver::configureDebounce(1, debounce);
     button1.enableInterrupt();
 
     // Configure Button two
     Button2_PTR = &button2;
     button2.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
-    button2.registerButtonFunc(button_func2,debounce);
+    button2.registerButtonFunc(button_func2);
+    debounce.FIRE_MODE = BUTTON_ON_HELD_X_SEC;
+    debounce.CTRL_DATA = 5;
+    ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
-    VStartSimpleLinkSpawnTask(3);
 
-    osi_TaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 1, &DEBOUNCE_TSK_HNDLE);
-    osi_TaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 1, &BLUETOOTH_READ_HNDLE);
+    xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
+    xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
 
     // attempt to use bluetooth
-  //  bluetooth.enterConfigureMode();
+//    bluetooth.enterTransferMode();
     //bluetooth.setReadMode();
-    bluetooth.sendMessage("at+version?\r\n",16);
+    bluetooth.sendMessage("at\r\n",4);
    // bluetooth.setWriteMode();
 
-    osi_start();
+    vTaskStartScheduler();
     return;
 }
 

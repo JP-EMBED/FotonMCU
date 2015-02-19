@@ -17,9 +17,42 @@
 #include "systick.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
 #define IS_MASKED  1
 #define DEBOUNCED  3
+
+static void PerformFunctionTaskButton(void * button)
+{
+	ButtonDriver * bdriver = reinterpret_cast<ButtonDriver * >(button);
+	bdriver->pressButton();
+	vTaskDelete( NULL );
+}
+
+
+static void BUTTON_SECOND_COUNTER_TASK(void * debounce)
+{
+	BUTTON_DEBOUNCE_CTRL * debounce_ctrl = reinterpret_cast<BUTTON_DEBOUNCE_CTRL * >(debounce);
+
+	do
+	{
+		debounce_ctrl->BUTTON->mStatus.HELD_COUNT +=1;
+		if(debounce_ctrl->CTRL_DATA-1 <= debounce_ctrl->BUTTON->mStatus.HELD_COUNT)
+		{
+			TaskHandle_t xHandle = NULL;
+			xTaskCreate(PerformFunctionTaskButton, "", 256, reinterpret_cast<void *>(debounce_ctrl->BUTTON) , 3 , &xHandle);
+			vTaskDelay(1 * portTICK_PERIOD_MS);
+			if(debounce_ctrl->FIRE_MODE == BUTTON_ON_PULSE_AT_X)
+				debounce_ctrl->BUTTON->mStatus.HELD_COUNT = 0;
+
+		}
+		vTaskDelay(985 /portTICK_PERIOD_MS);
+	}while(debounce_ctrl->CTRL_DATA-1 > debounce_ctrl->BUTTON->mStatus.HELD_COUNT);
+	debounce_ctrl->BUTTON->mStatus.HELD_COUNT = 0;
+	vTaskDelete( NULL );
+
+}
+
+
+
 
 // Debounce Task
 void BUTTON_DEBOUNCE_TASK(void * debounce_data)
@@ -34,14 +67,13 @@ void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 			{
 				if(Button1_Debounce.EXPECTED_STATE == Button1_PTR->getButtonState())
 				{
-					Button1_PTR->pressButton();
-				}
-				else
-				{
-					//Report("Debounce failed Pin Number %u with port %x and pin address %x: Expected %u and got %u",
-					//		Button1_PTR->mPin.PIN_NUMBER, Button1_PTR->mPin.PORT_ADDRESS ,
-					//		Button1_PTR->mPin.PIN_ADDRESS, Button1_Debounce.EXPECTED_STATE,
-					//		Button1_PTR->mStatus.BUTTON_STATE);
+
+					if(CHECK_PROCESS_FIRE(&Button1_Debounce,Button1_PTR->mStatus))
+					{
+						// call the function from another task (could be long blocking)
+						TaskHandle_t xHandle = NULL;
+						xTaskCreate(PerformFunctionTaskButton, "", OSI_STACK_SIZE, reinterpret_cast<void *>(Button1_PTR) , 3 , &xHandle);
+					}
 				}
 				Button1_Debounce.IS_DEBOUNCING = false;
 				Button1_Debounce.DEBOUNCE_COUNT = 0;
@@ -54,14 +86,10 @@ void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 			{
 				if(Button2_Debounce.EXPECTED_STATE == Button2_PTR->getButtonState())
 				{
-					Button2_PTR->pressButton();
-				}
-				else
-				{
-					/*Report("Debounce failed Pin Number %u with port %x and pin address %x: Expected %u and got %u",
-							Button2_PTR->mPin.PIN_NUMBER, Button2_PTR->mPin.PORT_ADDRESS ,
-							Button2_PTR->mPin.PIN_ADDRESS, Button2_Debounce.EXPECTED_STATE,
-							Button2_PTR->mStatus.BUTTON_STATE);*/
+					// call the function from another task (could be long blocking)
+				    TaskHandle_t xHandle = NULL;
+				    if(CHECK_PROCESS_FIRE(&Button2_Debounce,Button2_PTR->mStatus))
+				    	xTaskCreate(PerformFunctionTaskButton, "", OSI_STACK_SIZE, reinterpret_cast<void *>(Button2_PTR) , 3 , &xHandle);
 				}
 			    Button2_Debounce.IS_DEBOUNCING = false;
 			    Button2_Debounce.DEBOUNCE_COUNT = 0;
@@ -71,6 +99,74 @@ void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 
 		vTaskDelay(10 * portTICK_PERIOD_MS); // sleep 10 milliseconds
 	}
+}
+
+
+bool CHECK_PROCESS_FIRE(BUTTON_DEBOUNCE_CTRL * debounce_mode, ButtonSTATUS & current_status)
+{
+	switch(debounce_mode->FIRE_MODE)
+	{
+		case BUTTON_IGNORE:
+		default :
+		{
+			break;
+		}
+		case BUTTON_ON_PRESSED:
+		{
+			return current_status.BUTTON_STATE == 1;
+
+		}
+		case BUTTON_ON_RELEASED:
+		{
+			return current_status.BUTTON_STATE == 0;
+		}
+		case BUTTON_ON_BOTH:
+		{
+			return true;
+		}
+		case BUTTON_ON_PRESSED_X:
+		{
+			if(current_status.BUTTON_STATE)
+				current_status.PRESSED_COUNT += 1;
+			if(current_status.PRESSED_COUNT == debounce_mode->CTRL_DATA)
+			{
+				current_status.PRESSED_COUNT = 0;
+				return true;
+			}
+			break;
+		}
+		case BUTTON_ON_RELEASED_X:
+		{
+			if(!current_status.BUTTON_STATE)
+				current_status.RELEASED_COUNT += 1;
+			if(current_status.RELEASED_COUNT == debounce_mode->CTRL_DATA)
+			{
+				current_status.RELEASED_COUNT = 0;
+				return true;
+			}
+			break;
+		}
+		case BUTTON_ON_HELD_X_SEC:
+		{
+			if(!current_status.BUTTON_STATE)
+			{
+				current_status.HELD_COUNT = 0;
+				if(debounce_mode->BUTTON_TIMER != NULL)
+				{
+					vTaskDelete(debounce_mode->BUTTON_TIMER);
+				}
+				return false;
+			}
+			else
+			{
+				debounce_mode->BUTTON_TIMER = NULL;
+				xTaskCreate(BUTTON_SECOND_COUNTER_TASK, "", OSI_STACK_SIZE, reinterpret_cast<void *>(debounce_mode) , 3 , &debounce_mode->BUTTON_TIMER);
+			}
+
+
+		}
+	}
+	return false;
 }
 
 
@@ -123,10 +219,18 @@ ButtonDriver::ButtonDriver(unsigned char gpio_pin)
 
 
 
-void ButtonDriver::configureDebounce(const BUTTON_DEBOUNCE_CTRL & debounce_mode)
+void ButtonDriver::configureDebounce(unsigned int button_number, const BUTTON_DEBOUNCE_CTRL & debounce_mode)
 {
-
-
+	if(button_number == 1)
+	{
+		Button1_Debounce = debounce_mode;
+		Button1_Debounce.BUTTON = Button1_PTR;
+	}
+	else if(button_number == 2)
+	{
+		Button2_Debounce = debounce_mode;
+		Button2_Debounce.BUTTON = Button2_PTR;
+	}
 }
 
 
@@ -151,7 +255,6 @@ void ButtonDriver::disableInterrupt()
 {
 	GPIOIntDisable(mPin.PORT_ADDRESS,mPin.PIN_ADDRESS);
 	IntDisable(mPin.INT_PORT);
-
 }
 
 
@@ -168,8 +271,8 @@ bool ButtonDriver::setGPIOPinNumber(unsigned char gpio_pin_number)
 		return false;
 
 	// DEBGUG STATEMENT
-    Report("Set Pin Number %u with port %x and pin address %x",
-    		pin_number, port_address, pin_address);
+    //Report("Set Pin Number %u with port %x and pin address %x",
+    //		pin_number, port_address, pin_address);
 
     mPin.GPIO_PIN_NUM = gpio_pin_number;
     mPin.PIN_NUMBER = pin_number;

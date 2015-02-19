@@ -28,7 +28,7 @@
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <task.h>
-
+#include <timers.h>
 // BUTTON FIRE_MODES
 #define BUTTON_IGNORE            00  // Ignore all things related to button
 #define BUTTON_ON_PRESSED        01  // On pressed (fire once until released and pressed again)
@@ -38,7 +38,7 @@
 #define BUTTON_ON_RELEASED_X     05  // Fire after X releases (X is set in CTRL_DATA).
 #define BUTTON_ON_HELD_X_SEC     06  // Fire after held for X seconds (X is set in CTRL_DATA).
 #define BUTTON_ON_PULSE_AT_X     07  // Fire while held every X seconds (X is set in CTRL_DATA).
-
+class ButtonDriver;
 typedef struct ButtonSTATUS
 {
 	unsigned int  PRESSED_COUNT  : 4;
@@ -50,14 +50,14 @@ typedef struct ButtonSTATUS
 typedef struct BUTTON_DEBOUNCE_CTRL
 {
 	unsigned int  IS_DEBOUNCING  : 1;
-	unsigned int  DEBOUNCE_COUNT : 2;
-	unsigned int  CURRENT_STATE  : 1;
+	unsigned int  DEBOUNCE_COUNT : 3;
 	unsigned int  EXPECTED_STATE : 1;
 	unsigned int  FIRE_MODE      : 3;
 	unsigned int  CTRL_DATA      : 8;
+	TaskHandle_t  BUTTON_TIMER;
+	ButtonDriver *BUTTON;
 	BUTTON_DEBOUNCE_CTRL()
-		:IS_DEBOUNCING(false),DEBOUNCE_COUNT(0),
-		 CURRENT_STATE(false),EXPECTED_STATE(false),
+		:IS_DEBOUNCING(false),DEBOUNCE_COUNT(0),EXPECTED_STATE(false),
 		 FIRE_MODE(BUTTON_IGNORE),CTRL_DATA(0)
 	{	}
 
@@ -94,7 +94,7 @@ class ButtonDriver {
 protected:
 	// place holder function pointer. Register a function to be called when a button is pressed.
 	void 		      (*mButtonFunc)(const ButtonSTATUS & button_data, const bool &button_state);
-	void configureDebounce(const BUTTON_DEBOUNCE_CTRL & debounce);
+
     //bool setPinNumber(unsigned char pin_number);
     bool setGPIOPinNumber(unsigned char pin_number);
 public:
@@ -108,7 +108,7 @@ public:
 		unsigned long value = GPIOPinRead(mPin.PORT_ADDRESS,mPin.PIN_ADDRESS);
 		mStatus.BUTTON_STATE = (value == mPin.PIN_ADDRESS);
 	    return mStatus.BUTTON_STATE;}
-
+	static void configureDebounce(unsigned int button_number, const BUTTON_DEBOUNCE_CTRL & debounce_mode);
 	unsigned int getFireMode()
 	{
 		unsigned int fire_mode(0);
@@ -127,13 +127,12 @@ public:
 		return 0;//mFireMode.CTRL_DATA;
 	}
 	void pressButton(){
-		mButtonFunc(mStatus, mStatus.BUTTON_STATE);}
+			mButtonFunc(mStatus, mStatus.BUTTON_STATE);
+	}
 
-	void registerButtonFunc(void (*func_ptr)(const ButtonSTATUS &, const bool &),
-			                const BUTTON_DEBOUNCE_CTRL & debounce)
+	void registerButtonFunc(void (*func_ptr)(const ButtonSTATUS &, const bool &))
 	{
 		mButtonFunc = func_ptr;
-		configureDebounce(debounce);
 	}
 
 	~ButtonDriver();
@@ -151,13 +150,13 @@ extern TaskHandle_t DEBOUNCE_TSK_HNDLE;
 extern ButtonDriver * Button1_PTR;
 extern ButtonDriver * Button2_PTR;
 
+
 extern BUTTON_DEBOUNCE_CTRL Button1_Debounce;
 extern BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
 extern void BUTTON_DEBOUNCE_TASK(void * debounce_data);
-
+extern bool CHECK_PROCESS_FIRE(BUTTON_DEBOUNCE_CTRL * debounce_mode, ButtonSTATUS & current_status);
 extern void BUTTON_ISR(void);
-
 
 
 #endif /* BUTTONDRIVER_H_ */

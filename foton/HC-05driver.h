@@ -114,17 +114,18 @@ public:
 
 	HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
 			   unsigned char TX_pin,unsigned long TX_Mode,
-			   unsigned char RTS_pin,unsigned long RTS_Mode,
-			   unsigned char CONFIG_EN_PIN,unsigned long GPIO_Mode);
+			   unsigned char POWER_pin,unsigned long GPIO_power,
+			   unsigned char STATE_pin,unsigned long GPIO_state);
 
 
-	void configureDMATransfers();
-
+	void configureDMATransfers(bool livemode);
+	void enableDMA();
 	void enable(void);
 	void disable(void);
 	void enterConfigureMode(void);
 	void enterTransferMode(void);
 	void sendMessage(const char * message, unsigned int length);
+	void setPowerOn(bool power_on = true);
 	void processNextByte(char byte);
 	// Bluetooth AT Config Commands Specific to the HC-05 bluetooth
 	void setATCommand(const char * command){
@@ -141,6 +142,9 @@ public:
 	void setCommand(char * buffer){
 		WaitingForResponse = true;
 	}
+
+	void setLiveMode();
+	void setOtherMode();
 
 	/*bool testAT(){return false;}
 	bool resetBluetooth(){return false;}
@@ -196,13 +200,19 @@ private:
 	unsigned short  MessageCount;
 	bool            WaitingForResponse;
     bool            mEnabled;
+    bool            mPoweredON;
     HC_05_PARSE_STATES mPARSE_STATE;
+
+    // port addresses
 	unsigned long mStatePortAddress;
+	unsigned long mPowerPortAddress;
+	// pin numbers
 	unsigned char mStatePinNumber;
+	unsigned char mPowerPinNumber;
+	// pin addresses
 	unsigned char mStatePinAddress;
-	unsigned char mCTSPinNumber;
-	unsigned long mCTSPortAddress;
-	unsigned char mCTSPinAddress;
+	unsigned char mPowerPinAddress;
+
 
 };
 

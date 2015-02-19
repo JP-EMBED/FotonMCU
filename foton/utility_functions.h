@@ -18,6 +18,7 @@
 #define PINS_PER_REG 8
 #define MAX_GPIO_NUMBER 32
 #define MAX_PIN_NUMBER  64
+#define OSI_STACK_SIZE          512
 
 
 static unsigned char PinToPadMap[64] =
@@ -61,6 +62,7 @@ static unsigned int GPIO2Pin(unsigned char gpio_pin_number)
 		case   3: return PIN_58;
 		case   4: return PIN_59;
 		case   8: return PIN_62;
+		case  14: return PIN_05;
 		default : return PIN_ERROR;
 	}
 }
