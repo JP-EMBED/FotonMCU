@@ -1,8 +1,8 @@
 /************************************************************************
 * file: LEDBOARDGPIO.h
 * author: Kat Derby
-* Revision: 3.5
-* Last Revision Date: 12/5/2015
+* Revision: 3.8
+* Last Revision Date: 2/18/2015
 *
 * Defined Values: 
 *		- Defined Values that make using macros and the GPIO for the
@@ -19,13 +19,19 @@
 #include <driverlib/pin.h>
 #include <driverlib/gpio.h>
 #include <driverlib/prcm.h>
-#include "timingstuff.h"
+
+// Global Variables need for Display
+int addr[32] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+int P0_NUM=0;
+int P1_NUM=0;
+int SHIFT=0;
+int ADDR=0;
 
 // bit packed pin representation for each signal
 // Control Signals
 #define LATCH_PIN 0x01
 #define BLANK_PIN 0x04
-#define CLK_PIN PIN_02
+#define CLK_PIN 0x08
 
 // Color Coding Signals
 // Top Rows
@@ -49,7 +55,7 @@
 // Control Signals
 #define LATCH_PORT GPIOA0_BASE
 #define BLANK_PORT GPIOA1_BASE
-#define CLK_PORT TIMERA3_BASE
+#define CLK_PORT GPIOA1_BASE
 #define PWM_PORT TIMERA3_BASE
 
 // Color Coding Signals

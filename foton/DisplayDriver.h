@@ -1,8 +1,8 @@
 /************************************************************************
 * file: DisplayDriver.h
 * author: Kat Derby
-* Revision: 1.0
-* Last Revision Date: 2/5/2015
+* Revision: 1.1
+* Last Revision Date: 2/18/2015
 *
 * Macro Functions:
 *	- Macros used in sending data out to the LED board
@@ -57,7 +57,6 @@
 #include <driverlib/pin.h>
 #include <driverlib/gpio.h>
 #include <driverlib/prcm.h>
-#include "timingstuff.h"
 #include "LEDBoardGPIO.h"
 
 /**********************************************************************
@@ -67,7 +66,7 @@
  *
  **********************************************************************/
 #define SETP0( P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL) \
- P0_NUM = CURRENT_ROW*32  + CURRENT_PIXEL
+ P0_NUM = CURRENT_ROW*32 + CURRENT_PIXEL
 
 /**********************************************************************
  *
@@ -173,40 +172,25 @@
  * Enable the CLK signal
  *
  **********************************************************************/
- #define ENABLECLK() \
- HWREG(CLK_PORT + TIMER_O_CTL) |= TIMER_B & (TIMER_CTL_TAEN | TIMER_CTL_TBEN)
+ #define SETCLK() \
+ HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = CLK_PIN
 
  /**********************************************************************
  *
  * Disable the CLK signal
  *
  **********************************************************************/
- #define DISABLECLK() \
- HWREG(CLK_PORT + TIMER_O_CTL) &= ~(TIMER_B & (TIMER_CTL_TAEN | TIMER_CTL_TBEN))
-
-  /**********************************************************************
- *
- * Enable the PWM < TODO
- *
- **********************************************************************/
- #define ENABLEPWM() \
- HWREG(PWM_PORT + TIMER_O_CTL) |= TIMER_A & (TIMER_CTL_TAEN | TIMER_CTL_TBEN)
+ #define CLRCLK() \
+ HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = 0
 
  /**********************************************************************
  *
- * Disable the PWM < TODO
+ * Pulses the CLK signal
  *
  **********************************************************************/
- #define DISABLEPWM() \
- HWREG(PWM_PORT + TIMER_O_CTL) &= ~(TIMER_A & (TIMER_CTL_TAEN | TIMER_CTL_TBEN))
-
- /**********************************************************************
- *
- * Update duty cycle of the PWM < TODO
- * lvl: current iteration of delay time
- *
- **********************************************************************/
- #define UPDATEDUTYCYCLE ( level ) HWREG(PWM_PORT + TIMER_O_TAMATCHR) = BASE_DELAY_TIME*( 1 << level )
+ #define PULSECLK() \
+ HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = CLK_PIN; \
+ HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = 0
 
  /**********************************************************************
  *
@@ -220,7 +204,8 @@
 	SHIFT++; \
    else \
 	SHIFT=0; INCREMENTADDR(ADDR);}
- /**********************************************************************
+
+/**********************************************************************
  *
  * Increment address accordingly < TODO
  * ADDR: ccurrent row number
