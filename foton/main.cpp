@@ -94,7 +94,7 @@ static ButtonDriver button2(22);
 /*
  * Bluetooth (HC-05)
  * Board Pin	Function	GPIO Pin Alias	Pin Mode Config	Peripheral Pin	Foton Alias
- * PIN_18	 When pulled high, notifies HC-05 Ready_Read RX		GPIO_28	0	LED	BLUETOOTH_READ_ENABLE
+ * PIN_18	 When pulled high, powers bluetooth module		    GPIO_28	0	LED	BLUETOOTH_READ_ENABLE
  * PIN_05	 Changes HC-05 between configure and transmit mode.	GPIO_03	0	KEY	BLUETOOTH_STATE_ENABLE
  * PIN_55	 Data line for Bluetooth Tx							GPIO_01	5	RXD	BLUETOOTH_TX
  * PIN_57	 Data line for Bluetooth Rx							GPIO_02	5	TXD	BLUETOOTH_RX
@@ -239,6 +239,7 @@ void main()
    // bluetooth.enterTransferMode();
 
     //bluetooth.enableDMA();
+    bluetooth.setPowerOn(true);
     bluetooth.setLiveMode();
     bluetooth.enable();
 

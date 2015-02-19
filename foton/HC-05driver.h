@@ -186,10 +186,6 @@ public:
 	    ExitEnergyMode,
 	    GetDisconnecType*/
 
-	void setReadMode(void);
-
-	void setWriteMode(void);
-
 	~HC_05Bluetooth();
 	unsigned short  FrontIndex;
 	unsigned short  BackIndex;

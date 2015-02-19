@@ -316,7 +316,7 @@ void HC_05Bluetooth::setPowerOn(bool power_on)
 		if(!mPoweredON)
 		{
 			GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, mPowerPinAddress);
-
+			waitForModeChange();
 		}
 		else
 		{
@@ -325,7 +325,15 @@ void HC_05Bluetooth::setPowerOn(bool power_on)
 	}
 	else
 	{
-
+		if(mPoweredON)
+		{
+			GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, 0);
+			waitForModeChange();
+		}
+		else
+		{
+			Message("Attempted to power off an already off module");
+		}
 	}
 
 }
@@ -341,23 +349,6 @@ void HC_05Bluetooth::sendMessage(const char * message,unsigned int length)
 
 }
 
-
-void HC_05Bluetooth::setReadMode()
-{
-	//PinConfigSet(mPowerPinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD_PU);
-	GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, mPowerPinAddress);
-	waitForModeChange();
-
-}
-
-
-
-void HC_05Bluetooth::setWriteMode()
-{
-	//PinConfigSet(mPowerPinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD);
-	GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, 0);
-	waitForModeChange();
-}
 
 
 HC_05Bluetooth::~HC_05Bluetooth()
