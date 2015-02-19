@@ -19,13 +19,9 @@
 #include <driverlib/pin.h>
 #include <driverlib/gpio.h>
 #include <driverlib/prcm.h>
+#include "fotonrgb.h"
 
-// Global Variables need for Display
-int addr[32] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
-int P0_NUM=0;
-int P1_NUM=0;
-int SHIFT=0;
-int ADDR=0;
+#define IMAGE_SIZE 1024
 
 // bit packed pin representation for each signal
 // Control Signals
