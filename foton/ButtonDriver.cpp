@@ -34,18 +34,17 @@ static void BUTTON_SECOND_COUNTER_TASK(void * debounce)
 
 	do
 	{
+		vTaskDelay(995 /portTICK_PERIOD_MS);
 		debounce_ctrl->BUTTON->mStatus.HELD_COUNT +=1;
-		if(debounce_ctrl->CTRL_DATA-1 <= debounce_ctrl->BUTTON->mStatus.HELD_COUNT)
+		if(debounce_ctrl->CTRL_DATA <= debounce_ctrl->BUTTON->mStatus.HELD_COUNT)
 		{
 			TaskHandle_t xHandle = NULL;
 			xTaskCreate(PerformFunctionTaskButton, "", 256, reinterpret_cast<void *>(debounce_ctrl->BUTTON) , 3 , &xHandle);
 			vTaskDelay(1 * portTICK_PERIOD_MS);
 			if(debounce_ctrl->FIRE_MODE == BUTTON_ON_PULSE_AT_X)
 				debounce_ctrl->BUTTON->mStatus.HELD_COUNT = 0;
-
 		}
-		vTaskDelay(985 /portTICK_PERIOD_MS);
-	}while(debounce_ctrl->CTRL_DATA-1 > debounce_ctrl->BUTTON->mStatus.HELD_COUNT);
+	}while(debounce_ctrl->CTRL_DATA > debounce_ctrl->BUTTON->mStatus.HELD_COUNT);
 	debounce_ctrl->BUTTON->mStatus.HELD_COUNT = 0;
 	vTaskDelete( NULL );
 
@@ -57,8 +56,7 @@ static void BUTTON_SECOND_COUNTER_TASK(void * debounce)
 // Debounce Task
 void BUTTON_DEBOUNCE_TASK(void * debounce_data)
 {
-    // TODO: Add debounce task initialization
-	//ButtonDriver * button1 = (ButtonDriver *)debounce_data;
+
     for( ;; )
     {
 		if(Button1_Debounce.IS_DEBOUNCING)
@@ -146,6 +144,7 @@ bool CHECK_PROCESS_FIRE(BUTTON_DEBOUNCE_CTRL * debounce_mode, ButtonSTATUS & cur
 			}
 			break;
 		}
+		case BUTTON_ON_PULSE_AT_X:
 		case BUTTON_ON_HELD_X_SEC:
 		{
 			if(!current_status.BUTTON_STATE)
@@ -155,14 +154,13 @@ bool CHECK_PROCESS_FIRE(BUTTON_DEBOUNCE_CTRL * debounce_mode, ButtonSTATUS & cur
 				{
 					vTaskDelete(debounce_mode->BUTTON_TIMER);
 				}
-				return false;
 			}
 			else
 			{
 				debounce_mode->BUTTON_TIMER = NULL;
 				xTaskCreate(BUTTON_SECOND_COUNTER_TASK, "", OSI_STACK_SIZE, reinterpret_cast<void *>(debounce_mode) , 3 , &debounce_mode->BUTTON_TIMER);
 			}
-
+			break;
 
 		}
 	}

@@ -51,12 +51,12 @@
 #ifndef DISPLAYDRIVER_H_
 #define DISPLAYDRIVER_H_
 
-#include <inc/hw_types.h>
-#include <inc/hw_memmap.h>
-#include <inc/hw_gpio.h>
-#include <driverlib/pin.h>
-#include <driverlib/gpio.h>
-#include <driverlib/prcm.h>
+#include <hw_types.h>
+#include <hw_memmap.h>
+#include <hw_gpio.h>
+#include <pin.h>
+#include <gpio.h>
+#include <prcm.h>
 #include "LEDBoardGPIO.h"
 #include "fotonrgb.h"
 

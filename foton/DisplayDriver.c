@@ -11,12 +11,12 @@
 *			- Displays a 1064 pixel image to the LED board
 *
 *************************************************************************/
-#include <inc/hw_types.h>
-#include <inc/hw_memmap.h>
-#include <inc/hw_gpio.h>
-#include <driverlib/pin.h>
-#include <driverlib/gpio.h>
-#include <driverlib/prcm.h>
+#include <hw_types.h>
+#include <hw_memmap.h>
+#include <hw_gpio.h>
+#include <pin.h>
+#include <gpio.h>
+#include <prcm.h>
 
 #include "DisplayDriver.h"
 #include "LEDBoardGPIO.h"
