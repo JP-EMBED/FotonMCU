@@ -32,6 +32,10 @@
 #include "ButtonDriver.h"
 #include "led.h"
 
+// LED Driver includes
+#include "LEDBoardGPIO.h"
+#include "DisplayDriver.h"
+
 //*****************************************************************************
 //                          MACROS
 //*****************************************************************************
@@ -109,6 +113,9 @@ FOTON_LED_MESSAGE * CURRENT_MESSAGE;
 BUTTON_DEBOUNCE_CTRL Button1_Debounce;
 BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
+
+// LED Board Display Stuff
+static DisplayDriver driver;
 
 
 
@@ -222,7 +229,8 @@ void main()
     BoardInit();
 	UDMAInit();
 	// TODO Configure Display Driver and pins < make displaydriver static and global
-
+	ConfigureDisplayDriver(&driver);
+	ConfigLEDPins();
 
     //
     // Initialize uDMA

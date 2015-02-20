@@ -11,12 +11,20 @@
 *			- Displays a 1064 pixel image to the LED board
 *
 *************************************************************************/
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "portmacro.h"
+#include "osi.h"
+
 #include <hw_types.h>
 #include <hw_memmap.h>
 #include <hw_gpio.h>
 #include <pin.h>
 #include <gpio.h>
 #include <prcm.h>
+
 
 #include "DisplayDriver.h"
 #include "LEDBoardGPIO.h"
