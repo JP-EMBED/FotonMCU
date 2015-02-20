@@ -86,6 +86,7 @@ BoardInit(void)
 
 TaskHandle_t       DEBOUNCE_TSK_HNDLE;
 TaskHandle_t       BLUETOOTH_READ_HNDLE;
+TaskHandle_t       DISP_IMG_HNDLE;
 ButtonDriver * Button1_PTR;
 ButtonDriver * Button2_PTR;
 
@@ -213,7 +214,6 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
 
 
 
-
 void main()
 {
     //
@@ -221,6 +221,7 @@ void main()
     //
     BoardInit();
 	UDMAInit();
+	// TODO Configure Display Driver and pins < make displaydriver static and global
 
 
     //
@@ -279,7 +280,7 @@ void main()
 
     xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
     xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
-
+    xTaskCreate( DisplayCurrentImage, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
     // attempt to use bluetooth
 //    bluetooth.enterTransferMode();
     //bluetooth.setReadMode();

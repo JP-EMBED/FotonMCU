@@ -31,36 +31,41 @@
  * This function needs to be in a continuos looop to work correctly
  *
  **********************************************************************/
-void DisplayCurrentImage(DisplayDriver * driver)
+void DisplayCurrentImage(void * d)
 {
-	int i=0;
-	for (i=0; i<32; i++)
+	DisplayDriver * driver = (DisplayDriver *)d;
+	int CURRENT_PIXEL=0;
+	int CURRENT_ROW=0;
+	while(1)
 	{
-		SETP0( (*driver).P0_NUM,  (*driver).ADDR,  i);
-		SETP1( (*driver).P1_NUM,  (*driver).ADDR,  i);
-		SETCOLOR( (*driver).IMAGE_ONEBUFF,  (*driver).P0_NUM,  (*driver).P1_NUM,  0);
+		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
+		{
+			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
+			{
+				SETP0( (*driver).P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETP1( (*driver).P1_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETCOLOR( (*driver).IMAGE_ONEBUFF,  (*driver).P0_NUM,  (*driver).P1_NUM,  0);
 
-		//PULSECLK();
-		SETCLK();
-		// TODO < Fix delay issure here somehow
-		// UtilsDelay(300);
-		CLRCLK();
+				//PULSECLK();
+				SETCLK();
+				// TODO < Fix delay issure here somehow
+				vTaskDelay(CLK_PULSE);
+				CLRCLK();
+			}
+
+				SETBLANK();
+						// Change Address in board to correct Address
+				SETADDR((*driver).addr[CURRENT_ROW]);
+						//UtilsDelay(500);
+						// Set Latch Signal
+				SETLATCH();
+						// Clr Latch Signal
+				CLRLATCH();
+						// Clr Blank Signal
+				CLRBLANK();
+				vTaskDelay(ALPHA_DELAY); // fetch next delay
+		}
 	}
-
-		SETBLANK();
-				// Change Address in board to correct Address
-		SETADDR((*driver).addr[(*driver).ADDR]);
-				//UtilsDelay(500);
-				// Set Latch Signal
-		SETLATCH();
-				// delay
-		//UtilsDelay(50);
-				// Clr Latch Signal
-		CLRLATCH();
-				// Clr Blank Signal
-		CLRBLANK();
-				// Check if addr == 15, if not add 1 else set it to 0*/
-		INCREMENTADDR( (*driver).ADDR );
 }
 
 /**********************************************************************

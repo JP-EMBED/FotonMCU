@@ -21,6 +21,7 @@
 #include <prcm.h>
 #include "fotonrgb.h"
 
+// Image info
 #define IMAGE_SIZE 1024
 
 // bit packed pin representation for each signal
@@ -78,11 +79,7 @@
 #define D_MASK 0x1
 
 // Clock Values
-#define CLK_TIMER TIMER_B
-#define PWM TIMER TIMER_A
-#define SHIFT_CLK_RELOAD 96
-#define TIMER_INTERVAL_RELOAD   24576
-#define BASE_DELAY_TIME 192
-
+#define CLK_PULSE 110 // 110 nano seconds TODO figure out actual num
+#define ALPHA_DELAY 2*portTICK_PERIOD_MS //2 milliseconds, time between row output
 
 #endif /* LEDBOARDGPIO_H_ */
