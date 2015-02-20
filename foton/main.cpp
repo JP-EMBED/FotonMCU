@@ -273,7 +273,7 @@ void main()
     button2.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
     button2.registerButtonFunc(button_func2);
     debounce.FIRE_MODE = BUTTON_ON_PULSE_AT_X;
-    debounce.CTRL_DATA = 3;
+    debounce.CTRL_DATA = 1;
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
 

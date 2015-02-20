@@ -45,8 +45,7 @@ void DisplayCurrentImage(DisplayDriver * driver)
 		// TODO < Fix delay issure here somehow
 		// UtilsDelay(300);
 		CLRCLK();
-
-		}
+	}
 
 		SETBLANK();
 				// Change Address in board to correct Address

@@ -1,8 +1,8 @@
 /************************************************************************
 * file: DisplayDriver.h
 * author: Kat Derby
-* Revision: 1.1
-* Last Revision Date: 2/18/2015
+* Revision: 1.2
+* Last Revision Date: 2/19/2015
 *
 * Macro Functions:
 *	- Macros used in sending data out to the LED board
@@ -60,6 +60,21 @@
 #include "LEDBoardGPIO.h"
 #include "fotonrgb.h"
 
+/**********************************************************************
+ *
+ * struct: DisplayDriver
+ * Function: Hold parameters necessary for driving the LED Display
+ *
+ * addr[32] : Array that holds the actual values for the 0-15 addressing
+ * P0_NUM : pixel placement in the upper block of rows
+ * P1_NUM : pixel placement in the lower block of rows
+ * SHIFT : How much to shift each byte of color data
+ * IMAGE_ONEBUFF : buffer for exactly one full image for the grid
+ * IMAGE_TWOBUFF : second buffer for one full image for the grid
+ * CURRENT_DISP_IMAGE : pointer to the current buffer to be displayed
+ * NEXT_DISP_IMAGE : pointer to the next buffer to be displayed
+ *
+ **********************************************************************/
 typedef struct DisplayDriver
 {
 	int addr[32];
