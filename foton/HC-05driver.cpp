@@ -24,13 +24,20 @@
 #include "interrupt.h"
 
 #include "utility_functions.h"
-
+#include "DisplayDriver.h"
 #define BLUETUTH_BAUD_RATE      115200
 #define COMMAND_BAUD_RATE       38400
 #define BLUETUTHCLK             80000000
+#ifdef USING_SERIAL_FOR_BLUETOOTH
+#define BLUETOOTH               UARTA0_BASE
+#define BLUETOOTH_PERIPH        PRCM_UARTA0
+#define BLUETOOTH_INT           INT_UARTA0
+#else
 #define BLUETOOTH               UARTA1_BASE
 #define BLUETOOTH_PERIPH        PRCM_UARTA1
 #define BLUETOOTH_INT           INT_UARTA1
+#endif
+
 #define SYSTICKS_PER_SECOND     100
 #define BUFF_SIZE               20
 #define HI_MASK                 5
@@ -169,17 +176,17 @@ void HC_05Bluetooth::setLiveMode()
 	//   BLUETOOTH_FIFO + 4 BYTES (MIDDLE FIFO)
 	//   NEXT_SRC_ADDRESS (Current + 32 bits)
 	// Receive the Data
-	//SetupTransfer(UDMA_CH10_UARTA1_RX, UDMA_MODE_BASIC,8,UDMA_SIZE_8,
-	//	           UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
-	//	           UDMA_SRC_INC_NONE,mRXDataBuff,UDMA_DST_INC_8);
+	SetupTransfer(UDMA_CH10_UARTA1_RX, UDMA_MODE_BASIC,8,UDMA_SIZE_8,
+		           UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
+		           UDMA_SRC_INC_NONE,mRXDataBuff,UDMA_DST_INC_8);
 
 
 
 	// Send The Data
-	//SetupTransfer(UDMA_CH11_UARTA1_TX, UDMA_MODE_BASIC,
-	//	          8,UDMA_SIZE_8, UDMA_ARB_2, mRXDataBuff,
-	//	          UDMA_SRC_INC_8,(void *)(BLUETOOTH+UART_O_DR),
-	//	          UDMA_DST_INC_NONE);
+	SetupTransfer(UDMA_CH11_UARTA1_TX, UDMA_MODE_BASIC,
+		          8,UDMA_SIZE_8, UDMA_ARB_2, mRXDataBuff,
+     	          UDMA_SRC_INC_8,(void *)(BLUETOOTH+UART_O_DR),
+		          UDMA_DST_INC_NONE);
 }
 
 
@@ -274,15 +281,30 @@ void HC_05Bluetooth::processNextByte(char byte)
 		{
 
 			CURRENT_MESSAGE->FUNC_MJR = (byte >> HI_MASK);
-			CURRENT_MESSAGE->ROW = (byte &LOW_MASK);
+			CURRENT_MESSAGE->CTRL_1 = (byte &LOW_MASK);
 			mPARSE_STATE = FUNCTION_MNR;
 			break;
 		}
 		case FUNCTION_MNR:
 		{
 			CURRENT_MESSAGE->FUNC_MNR = (byte >> HI_MASK);
-			CURRENT_MESSAGE->COL = (byte & LOW_MASK);
-			mPARSE_STATE = RED;
+			CURRENT_MESSAGE->CTRL_2 = (byte & LOW_MASK);
+			switch(CURRENT_MESSAGE->FUNC_MNR)
+			{
+				case LED_COLOR_MNR:
+				{
+					mPARSE_STATE = RED;
+					break;
+				}
+				case LED_SET_MNR:
+				{
+					mPARSE_STATE = START;
+					ledSet(CURRENT_MESSAGE->CTRL_1,CURRENT_MESSAGE->CTRL_2);
+					break;
+				}
+				default:break;
+			}
+
 			break;
 		}
 		case RED:
@@ -301,7 +323,7 @@ void HC_05Bluetooth::processNextByte(char byte)
 		{
 			CURRENT_MESSAGE->BLUE = byte;
 			// perform or put the command into action
-			//LEDBoard->ledSet(CURRENT_MESSAGE);
+			ledSetColor(CURRENT_MESSAGE->RED,CURRENT_MESSAGE->GREEN,CURRENT_MESSAGE->BLUE);
 			mPARSE_STATE = START;
 			break;
 		}

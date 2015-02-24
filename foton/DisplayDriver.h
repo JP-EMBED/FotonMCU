@@ -100,12 +100,14 @@ typedef struct DisplayDriver
 	FOTON_RGB * CURRENT_DISP_IMAGE;
 	FOTON_RGB * NEXT_DISP_IMAGE;
 
-}DisplayDriver;
 
+}DisplayDriver;
+extern DisplayDriver * FOTON_LED_BOARD;
 extern void ConfigLEDPins(void);
 extern void DisplayCurrentImage(void * d);
 extern void ConfigureDisplayDriver( DisplayDriver * driver );
-
+extern void ledSetColor(unsigned char red,unsigned char green, unsigned char blue);
+extern void ledSet(unsigned char row, unsigned char col);
 /**********************************************************************
  *
  * sets the current pixel for the row in top section of the led display

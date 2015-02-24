@@ -31,6 +31,9 @@
 #include "fotonrgb.h"
 
 
+void ledSetColor(unsigned char red,unsigned char green, unsigned char blue){}
+void ledSet(unsigned char row, unsigned char col){}
+
 /**********************************************************************
  *
  * the image displayed with this function, only uses rgb

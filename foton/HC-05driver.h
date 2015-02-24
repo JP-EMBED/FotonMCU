@@ -25,20 +25,47 @@
 typedef struct FOTON_LED_MESSAGE
 {
     unsigned char FUNC_MJR : 3;
-    unsigned char ROW      : 5;
+    unsigned char CTRL_1   : 5;
     unsigned char FUNC_MNR : 3;
-    unsigned char COL      : 5;
+    unsigned char CTRL_2   : 5;
     unsigned char RED      : 8;
     unsigned char GREEN    : 8;
     unsigned char BLUE     : 8;
 }FOTON_LED_MESSAGE;
 
 
+enum FUNCTIONS_MAJOR
+{
+    NONE = 0,
+    LED_MJR,
+    DRAW_MJR,
+    TRANSFER_MJR,
+    SYSTEM_MJR
+};
+
+enum LED_MINOR
+{
+    LED_CLEAR_MNR = 0,
+    LED_SET_MNR,
+    LED_COLOR_MNR,
+    LED_READ_MNR
+};
+
+
+enum DRAW_MINOR
+{
+    LINE = 0,
+    SQUARE,
+    CIRCLE
+};
+
 enum HC_05_PARSE_STATES
 {
 	START = 0,
 	FUNCTION_MJR,
 	FUNCTION_MNR,
+	COL,
+	ROW,
 	RED,
 	GREEN,
 	BLUE
@@ -190,6 +217,7 @@ public:
 	unsigned short  FrontIndex;
 	unsigned short  BackIndex;
 	char            mMessageBuffer[MAX_COMMAND_INDEX];
+	unsigned char   mRXDataBuff[8];
 private:
 	void waitForModeChange(void);
 

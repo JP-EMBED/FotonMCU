@@ -26,7 +26,7 @@
 #include "udma_if.h"
 
 #include "pin_mux.h"
-
+#define USING_SERIAL_FOR_BLUETOOTH
 #include "HC-05driver.h"
 #include "pin.h"
 #include "ButtonDriver.h"
@@ -39,7 +39,7 @@
 //*****************************************************************************
 //                          MACROS
 //*****************************************************************************
-#define APPLICATION_VERSION     "0.1.0"
+#define APPLICATION_VERSION     "0.2.0"
 #define APP_NAME                "Foton_FW"
 #define SYSTICKS_PER_SECOND     100
 #define BUFF_SIZE               20
@@ -105,8 +105,11 @@ static ButtonDriver button2(22);
  * PIN_57	 Data line for Bluetooth Rx							GPIO_02	5	TXD	BLUETOOTH_RX
  *
  */
-
-static HC_05Bluetooth  bluetooth(PIN_02,PIN_MODE_7,PIN_01,PIN_MODE_7,28,PIN_MODE_0,14,PIN_MODE_0);
+#ifdef USING_SERIAL_FOR_BLUETOOTH
+static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_3,PIN_55,PIN_MODE_3,28,PIN_MODE_0,14,PIN_MODE_0);
+#else
+static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_7,PIN_55,PIN_MODE_7,28,PIN_MODE_0,14,PIN_MODE_0);
+#endif
 HC_05Bluetooth * FOTON_BLUETOOTH;
 static FOTON_LED_MESSAGE local_current_message;
 FOTON_LED_MESSAGE * CURRENT_MESSAGE;
@@ -115,7 +118,8 @@ BUTTON_DEBOUNCE_CTRL Button2_Debounce;
 
 
 // LED Board Display Stuff
-static DisplayDriver driver;
+static DisplayDriver leddisplay;
+DisplayDriver * FOTON_LED_BOARD;
 
 
 
@@ -229,7 +233,7 @@ void main()
     BoardInit();
 	UDMAInit();
 	// TODO Configure Display Driver and pins < make displaydriver static and global
-	ConfigureDisplayDriver(&driver);
+	ConfigureDisplayDriver(&leddisplay);
 	ConfigLEDPins();
 
     //
@@ -251,7 +255,7 @@ void main()
     bluetooth.setPowerOn(true);
     bluetooth.setLiveMode();
     bluetooth.enable();
-
+    FOTON_LED_BOARD = &leddisplay;
     // Clear terminal
     //
     ClearTerm();
