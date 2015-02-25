@@ -25,17 +25,21 @@
 
 #include "utility_functions.h"
 #include "DisplayDriver.h"
-#define BLUETUTH_BAUD_RATE      115200
+#define BLUETUTH_BAUD_RATE      1382400
 #define COMMAND_BAUD_RATE       38400
 #define BLUETUTHCLK             80000000
 #ifdef USING_SERIAL_FOR_BLUETOOTH
 #define BLUETOOTH               UARTA0_BASE
 #define BLUETOOTH_PERIPH        PRCM_UARTA0
 #define BLUETOOTH_INT           INT_UARTA0
+#define RX_DMA_CHANNEL          UDMA_CH8_UARTA0_RX
+#define TX_DMA_CHANNEL          UDMA_CH9_UARTA0_TX
 #else
 #define BLUETOOTH               UARTA1_BASE
 #define BLUETOOTH_PERIPH        PRCM_UARTA1
 #define BLUETOOTH_INT           INT_UARTA1
+#define RX_DMA_CHANNEL          UDMA_CH10_UARTA1_RX
+#define TX_DMA_CHANNEL          UDMA_CH11_UARTA1_TX
 #endif
 
 #define SYSTICKS_PER_SECOND     100
@@ -54,12 +58,64 @@ void BluetoothReadTask(void * nothing)
 		int index(0);
 		if((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
 		{
-			while(index < 40 && (FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
+			while((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
 			{
-				// PROCESS BYTE BY BYTE
+				CURRENT_MESSAGE->FUNC_CTRL = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
 				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
 					FOTON_BLUETOOTH->FrontIndex = 0;
-				FOTON_BLUETOOTH->processNextByte(FOTON_BLUETOOTH->mMessageBuffer[FOTON_BLUETOOTH->FrontIndex]);
+			    CURRENT_MESSAGE->DATA1 = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+					FOTON_BLUETOOTH->FrontIndex = 0;
+			    CURRENT_MESSAGE->DATA2 = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+					FOTON_BLUETOOTH->FrontIndex = 0;
+			    CURRENT_MESSAGE->DATA3 =  RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+
+				switch(CURRENT_MESSAGE->FUNC_CTRL)
+				{
+					case LED_SET_COLOR:
+					{
+						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3);
+						break;
+					}
+					case LED_SET_AT:
+					{
+						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2);
+						break;
+					}
+					default:{break;}
+				}
+				++FOTON_BLUETOOTH->FrontIndex;
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+					FOTON_BLUETOOTH->FrontIndex = 0;
+			}
+		}
+		vTaskDelay(30 * portTICK_PERIOD_MS); // sleep 30 milliseconds
+	}
+}
+
+void BluetoothProcessATTask(void*nothing)
+{
+	while(1)
+	{
+		int index(0);
+		char last = '\0';
+		char current = '\0';
+		char command_read[200];
+		if((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
+		{
+			while(FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex)
+			{
+				last = current;
+				// PROCESS BYTE BY BYTE
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+				{
+					FOTON_BLUETOOTH->FrontIndex = 0;
+				}
+				current =  RXDATABUFF[FOTON_BLUETOOTH->FrontIndex];
+				command_read[index++] = current;
+				if(last == '\r' && current == '\n')
+					FOTON_BLUETOOTH->processATCommandResponse(command_read, index);
 				++FOTON_BLUETOOTH->FrontIndex;
 			}
 			//UARTIntEnable(BLUETOOTH, UART_INT_DMARX);
@@ -73,28 +129,29 @@ void BluetoothReadTask(void * nothing)
 void BlueToothInterruptHandler()
 {
 	unsigned long ulstatus =  UARTIntStatus(BLUETOOTH,true);
-	UARTIntClear(BLUETOOTH, ulstatus);
 
-	// FIND NEW WAY TO CLEAR DMA
-	//UARTDMADisable(BLUETOOTH, UART_DMA_RX);
-	UARTIntClear(BLUETOOTH,ulstatus);
-	uDMAIntClear(UART_DMA_RX |UART_DMA_TX);
-	ulstatus =  UARTIntStatus(BLUETOOTH,true);
-	char value_read;
-	char empty;
-	empty = -1;
+    // Only Fires For UART_INT_DMARX
 	if(UARTCharsAvail(BLUETOOTH))
 	{
-		while(empty != (value_read = UARTCharGetNonBlocking(BLUETOOTH)))
-		{
-			// GRAB FROM FIFO UNTIL IT IS EMPTY
-			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
-				FOTON_BLUETOOTH->BackIndex = 0;
-			FOTON_BLUETOOTH->mMessageBuffer[FOTON_BLUETOOTH->BackIndex] = value_read;
-			++FOTON_BLUETOOTH->BackIndex;
+		FOTON_BLUETOOTH->BackIndex+= 4; // THE DMA ALREADY TRANSFERED 4 bytes
+		if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX ) // Ring buffer, check end
+			FOTON_BLUETOOTH->BackIndex = (FOTON_BLUETOOTH->BackIndex - MAX_COMMAND_INDEX); // adjust index
 
+		// Grab any characters left in the fifo (or are comming in live)
+		while(UARTCharsAvail(BLUETOOTH))
+		{
+			RXDATABUFF[FOTON_BLUETOOTH->BackIndex++] = UARTCharGet(BLUETOOTH); // stuff in Ring Buffer
+			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
+					FOTON_BLUETOOTH->BackIndex = 0;
 		}
+
+		// Reconfigure DMA for next transfer
+		SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,4,UDMA_SIZE_8,
+				       UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
+			           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
 	}
+	UARTIntClear(BLUETOOTH,UART_INT_DMARX); // Clear the interrupt
+
 
 }
 
@@ -119,40 +176,32 @@ HC_05Bluetooth::HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
 			BLUETUTH_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
 		                   UART_CONFIG_PAR_NONE));
 
+
+	// Initialize State GPIO pin
 	getPinNumber(STATE_pin,&mStatePinNumber,&mStatePortAddress,&mStatePinAddress);
-
 	unsigned long prcm_port(getGPIOPRCMPort(mStatePortAddress));
-
 	PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
-
-
 	PinTypeGPIO(mStatePinNumber, GPIO_state, false);
 	GPIODirModeSet(mStatePortAddress,mStatePinAddress,GPIO_DIR_MODE_OUT);
 
-	getPinNumber(POWER_pin, &mPowerPinNumber, &mPowerPortAddress, &mPowerPinAddress);
 
+	// Initialize Power GPIO pin
+	getPinNumber(POWER_pin, &mPowerPinNumber, &mPowerPortAddress, &mPowerPinAddress);
 	prcm_port = getGPIOPRCMPort(mPowerPortAddress);
 	PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
-
 	PinTypeGPIO(mPowerPinNumber, GPIO_power, false);
 	GPIODirModeSet(mPowerPortAddress,mPowerPinAddress,GPIO_DIR_MODE_OUT);
-
-
-
-	FrontIndex = 0;
-	BackIndex = 0;
-	MessageCount = 0;
 
 }
 
 
 void HC_05Bluetooth::enableDMA()
 {
-	uDMAChannelAssign(UDMA_CH10_UARTA1_RX);
-	uDMAChannelAssign(UDMA_CH11_UARTA1_TX);
-    UARTIntEnable(BLUETOOTH, UART_INT_RX |  UART_INT_DMARX);
+	uDMAChannelAssign(RX_DMA_CHANNEL);
+	uDMAChannelAssign(TX_DMA_CHANNEL);
+    UARTIntEnable(BLUETOOTH,  UART_INT_DMARX);
 
-    UARTDMAEnable(BLUETOOTH, UART_DMA_RX |UART_DMA_TX);
+    UARTDMAEnable(BLUETOOTH, UART_DMA_RX );
     IntRegister(BLUETOOTH_INT, BlueToothInterruptHandler);
     IntEnable(BLUETOOTH_INT);
 }
@@ -167,26 +216,28 @@ void HC_05Bluetooth::setLiveMode()
 {
 	// Set To 4 byte mode
 	// 32 bit packets
-	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX4_8, UART_FIFO_RX4_8);
+	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX4_8, UART_FIFO_RX1_8);
+
 	// setup DMA Control Table for 4 byte transfer from FIFO
-	//   32 bits  (DEST_SIZE)
-	//   32 bits  (SRC_SIZE)
+	//   32 bits (4x8bits)  (DEST_SIZE)
+	//   32 bits(4x8bits)  (SRC_SIZE)
 	//   Source Address Increment? - NO
 	//   Destination Address Increment? 32 BITS
-	//   BLUETOOTH_FIFO + 4 BYTES (MIDDLE FIFO)
-	//   NEXT_SRC_ADDRESS (Current + 32 bits)
+	//   BLUETOOTH_FIFO (MIDDLE FIFO)
+	//   Initial set uses RXDATABUFF with not offset
 	// Receive the Data
-	SetupTransfer(UDMA_CH10_UARTA1_RX, UDMA_MODE_BASIC,8,UDMA_SIZE_8,
-		           UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
-		           UDMA_SRC_INC_NONE,mRXDataBuff,UDMA_DST_INC_8);
-
-
+	FrontIndex = 0;
+	BackIndex = 0;
+	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,4,UDMA_SIZE_8,
+		           UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
+		           UDMA_SRC_INC_NONE,RXDATABUFF,UDMA_DST_INC_8);
 
 	// Send The Data
-	SetupTransfer(UDMA_CH11_UARTA1_TX, UDMA_MODE_BASIC,
+	// enabled TX to come
+	/*	SetupTransfer(UDMA_CH11_UARTA1_TX, UDMA_MODE_BASIC,
 		          8,UDMA_SIZE_8, UDMA_ARB_2, mRXDataBuff,
      	          UDMA_SRC_INC_8,(void *)(BLUETOOTH+UART_O_DR),
-		          UDMA_DST_INC_NONE);
+		          UDMA_DST_INC_NONE);*/
 }
 
 
@@ -218,23 +269,31 @@ void HC_05Bluetooth::disable()
 
 void HC_05Bluetooth::enterConfigureMode()
 {
-	//MAP_PRCMPeripheralReset(BLUETOOTH_PERIPH);
-	//PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
-	//long value = GPIOPinRead(mStatePortAddress,mStatePinAddress);
-
-	//PRCMPeripheralReset(BLUETOOTH_PERIPH);
-	//PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
+	// Disable the bluetooth and raise State pin
+	disable();
 	GPIOPinWrite(mStatePortAddress,mStatePinAddress, mStatePinAddress);
-
-
-	long value = GPIOPinRead(mStatePortAddress,mStatePinAddress);
+	setPowerOn(false);
+	waitForModeChange();
 
 	// set baud to 38400
-	UARTConfigSetExpClk(BLUETOOTH,BLUETUTHCLK,
-		COMMAND_BAUD_RATE, (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-		UART_CONFIG_PAR_NONE));
-	enable();
+	UARTConfigSetExpClk(BLUETOOTH,BLUETUTHCLK,COMMAND_BAUD_RATE,
+		               (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+	// Power bluetooth back on
+	setPowerOn(true);
+	waitForModeChange();
 
+	// If transfer task exists, delete it and create command task
+	if(BLUETOOTH_READ_HNDLE)
+		vTaskDelete(BLUETOOTH_READ_HNDLE);
+	xTaskCreate( BluetoothProcessATTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_CMD_READ_HNDLE);
+	enable(); // enabled once again
+
+	// Sleep for a while to let HC-05 restart
+	waitForModeChange();
+	waitForModeChange();
+	waitForModeChange();
+	waitForModeChange();
+	mTransferModeEnabled = false;
 
 }
 
@@ -242,94 +301,54 @@ void HC_05Bluetooth::enterConfigureMode()
 void HC_05Bluetooth::waitForModeChange()
 {
 	// wait some time for the HC-05 to catch up on mode change
-	for(int i = 0; i < 3; ++i)
+	for(int i = 0; i < 100000; ++i)
 		 __asm("    nop\n"
 		        "    nop\n"
 		        "    nop\n"
-		        "    nop\n");
+		        "    nop\n"
+				"    nop\n"
+				"    nop\n"
+				"    nop\n"
+				"    nop\n");
 }
 
 void HC_05Bluetooth::enterTransferMode()
 {
-	//MAP_PRCMPeripheralReset(BLUETOOTH_PERIPH);
-	//PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
-	//PRCMPeripheralReset(BLUETOOTH_PERIPH);
-	//disable();
+
+	disable();
 	GPIOPinWrite(mStatePortAddress,mStatePinAddress, 0);
-    //PinConfigSet(mStatePinNumber,PIN_STRENGTH_2MA,PIN_TYPE_STD_PD);
+	setPowerOn(false);
+
 	waitForModeChange();
+	//PRCMPeripheralReset(BLUETOOTH_PERIPH);
+	//PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
 	// set clock speed back to 1382400
 	UARTConfigSetExpClk(BLUETOOTH,BLUETUTHCLK,BLUETUTH_BAUD_RATE,
-	                       (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+	                   (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
+
+
+	setPowerOn(true);
+	waitForModeChange();
+	if(BLUETOOTH_CMD_READ_HNDLE)
+		vTaskDelete(BLUETOOTH_CMD_READ_HNDLE);
+	xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
 	enable();
-
+	waitForModeChange();
+	waitForModeChange();
+	waitForModeChange();
+	waitForModeChange();
+	mTransferModeEnabled = true;
 
 }
 
 
-void HC_05Bluetooth::processNextByte(char byte)
+void HC_05Bluetooth::processATCommandResponse(char command[], int last_index)
 {
-	switch(mPARSE_STATE)
-	{
-		case START:
-		{
-			mPARSE_STATE = FUNCTION_MJR;
-			break;
-		}
-		case FUNCTION_MJR:
-		{
-
-			CURRENT_MESSAGE->FUNC_MJR = (byte >> HI_MASK);
-			CURRENT_MESSAGE->CTRL_1 = (byte &LOW_MASK);
-			mPARSE_STATE = FUNCTION_MNR;
-			break;
-		}
-		case FUNCTION_MNR:
-		{
-			CURRENT_MESSAGE->FUNC_MNR = (byte >> HI_MASK);
-			CURRENT_MESSAGE->CTRL_2 = (byte & LOW_MASK);
-			switch(CURRENT_MESSAGE->FUNC_MNR)
-			{
-				case LED_COLOR_MNR:
-				{
-					mPARSE_STATE = RED;
-					break;
-				}
-				case LED_SET_MNR:
-				{
-					mPARSE_STATE = START;
-					ledSet(CURRENT_MESSAGE->CTRL_1,CURRENT_MESSAGE->CTRL_2);
-					break;
-				}
-				default:break;
-			}
-
-			break;
-		}
-		case RED:
-		{
-			CURRENT_MESSAGE->RED = byte;
-			mPARSE_STATE = GREEN;
-			break;
-		}
-		case GREEN:
-		{
-			CURRENT_MESSAGE->GREEN = byte;
-			mPARSE_STATE = BLUE;
-			break;
-		}
-		case BLUE:
-		{
-			CURRENT_MESSAGE->BLUE = byte;
-			// perform or put the command into action
-			ledSetColor(CURRENT_MESSAGE->RED,CURRENT_MESSAGE->GREEN,CURRENT_MESSAGE->BLUE);
-			mPARSE_STATE = START;
-			break;
-		}
-		default:{break;}
-	}
+	int j;
 }
+
+
 
 void HC_05Bluetooth::setPowerOn(bool power_on)
 {
@@ -338,7 +357,7 @@ void HC_05Bluetooth::setPowerOn(bool power_on)
 		if(!mPoweredON)
 		{
 			GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, mPowerPinAddress);
-			waitForModeChange();
+			mPoweredON = true;
 		}
 		else
 		{
@@ -350,7 +369,7 @@ void HC_05Bluetooth::setPowerOn(bool power_on)
 		if(mPoweredON)
 		{
 			GPIOPinWrite(mPowerPortAddress,mPowerPinAddress, 0);
-			waitForModeChange();
+			mPoweredON = false;
 		}
 		else
 		{
@@ -367,7 +386,6 @@ void HC_05Bluetooth::sendMessage(const char * message,unsigned int length)
 	{
 		UARTCharPut(BLUETOOTH,message[i]);
 	}
-
 
 }
 

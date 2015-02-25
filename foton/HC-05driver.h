@@ -9,10 +9,7 @@
 #define HC_05DRIVER_HP_
 
 
-#define TX_PIN  PIN_55 // 54
-#define RX_PIN  PIN_57 // 56
-#define RTS_PIN PIN_20 // 19
-#define STATE_PIN PIN_18 // 17
+
 
 #define MAX_NAME_LENGTH 90
 #define MAX_COMMAND_INDEX 300
@@ -22,34 +19,24 @@
 #include "ButtonDriver.h"
 
 
-typedef struct FOTON_LED_MESSAGE
+typedef struct FOTON_LIVE_MESSAGE
 {
-    unsigned char FUNC_MJR : 3;
-    unsigned char CTRL_1   : 5;
-    unsigned char FUNC_MNR : 3;
-    unsigned char CTRL_2   : 5;
-    unsigned char RED      : 8;
-    unsigned char GREEN    : 8;
-    unsigned char BLUE     : 8;
-}FOTON_LED_MESSAGE;
+    unsigned char FUNC_CTRL;
+    unsigned char DATA1;
+    unsigned char DATA2;
+    unsigned char DATA3;
+}FOTON_LIVE_MESSAGE;
 
 
 enum FUNCTIONS_MAJOR
 {
     NONE = 0,
-    LED_MJR,
-    DRAW_MJR,
-    TRANSFER_MJR,
-    SYSTEM_MJR
+    LED_CLEAR,
+    LED_SET_COLOR,
+    LED_SET_AT,
+    LED_READ
 };
 
-enum LED_MINOR
-{
-    LED_CLEAR_MNR = 0,
-    LED_SET_MNR,
-    LED_COLOR_MNR,
-    LED_READ_MNR
-};
 
 
 enum DRAW_MINOR
@@ -62,13 +49,10 @@ enum DRAW_MINOR
 enum HC_05_PARSE_STATES
 {
 	START = 0,
-	FUNCTION_MJR,
-	FUNCTION_MNR,
-	COL,
-	ROW,
-	RED,
-	GREEN,
-	BLUE
+	LIVE_FUNCTION_DECODE,
+	LIVE_DATA1,
+	LIVE_DATA2,
+	LIVE_DONE,
 };
 
 //#include "queue.h"
@@ -152,8 +136,8 @@ public:
 	void enterConfigureMode(void);
 	void enterTransferMode(void);
 	void sendMessage(const char * message, unsigned int length);
+	void processATCommandResponse(char command[], int last_index);
 	void setPowerOn(bool power_on = true);
-	void processNextByte(char byte);
 	// Bluetooth AT Config Commands Specific to the HC-05 bluetooth
 	void setATCommand(const char * command){
 		WaitingForResponse = true;
@@ -216,8 +200,7 @@ public:
 	~HC_05Bluetooth();
 	unsigned short  FrontIndex;
 	unsigned short  BackIndex;
-	char            mMessageBuffer[MAX_COMMAND_INDEX];
-	unsigned char   mRXDataBuff[8];
+	bool isTransfering() {return mTransferModeEnabled;}
 private:
 	void waitForModeChange(void);
 
@@ -225,6 +208,7 @@ private:
 	bool            WaitingForResponse;
     bool            mEnabled;
     bool            mPoweredON;
+    bool            mTransferModeEnabled;
     HC_05_PARSE_STATES mPARSE_STATE;
 
     // port addresses
@@ -240,8 +224,11 @@ private:
 
 };
 
-
+extern char RXDATABUFF[MAX_COMMAND_INDEX];
 extern HC_05Bluetooth *  FOTON_BLUETOOTH;
 extern void BluetoothReadTask(void *);
-extern FOTON_LED_MESSAGE * CURRENT_MESSAGE;
+extern void BluetoothProcessATTask(void*);
+extern TaskHandle_t BLUETOOTH_READ_HNDLE;
+extern TaskHandle_t BLUETOOTH_CMD_READ_HNDLE;
+extern FOTON_LIVE_MESSAGE * CURRENT_MESSAGE;
 #endif /* HC_05DRIVER_HPP_ */
