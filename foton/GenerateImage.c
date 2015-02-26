@@ -18,7 +18,7 @@ void FillVary (DisplayDriver * driver)
 		{
 			FillRed(a,a+1,driver);
 			FillGreen(a+1,a+2,driver);
-			FillBlue(a+2,a+3,drive);
+			FillBlue(a+2,a+3,driver);
 			FillWhite(a+3,a+4,driver);
 			FillPurple(a+4,a+5,driver);
 			FillYellow(a+5,a+6,driver);

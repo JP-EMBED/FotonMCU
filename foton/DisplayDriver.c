@@ -59,7 +59,7 @@ void DisplayCurrentImage(void * d)
 
 				//PULSECLK();
 				SETCLK();
-				// TODO < Fix delay issure here somehow
+				// TODO < Fix delay issue here somehow
 				vTaskDelay(CLK_PULSE);
 				CLRCLK();
 			}

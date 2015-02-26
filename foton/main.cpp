@@ -35,6 +35,7 @@
 // LED Driver includes
 #include "LEDBoardGPIO.h"
 #include "DisplayDriver.h"
+#include "GenerateImage.h"
 
 //*****************************************************************************
 //                          MACROS
@@ -228,12 +229,13 @@ void main()
 	UDMAInit();
 	// TODO Add configure calls back after BCM Driver works a bit.
 	// TODO Configure Display Driver and pins < make displaydriver static and global
-	//ConfigureDisplayDriver(&leddisplay);
-	//ConfigLEDPins();
+	ConfigureDisplayDriver(&leddisplay);
+	FillVary(&leddisplay);
+	ConfigLEDPins();
 
 
 	// initi the clock the first time.
-	PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
+	//PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
 
 
     InitTerm();
@@ -273,12 +275,12 @@ void main()
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
 
-    xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
+    //xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
-    //xTaskCreate( DisplayCurrentImage, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImage, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
 
     // attempt to use bluetooth
-    bluetooth.sendMessage("AT+UART?\r\n",22);
+  //  bluetooth.sendMessage("AT+UART?\r\n",22);
 
     vTaskStartScheduler();
     return;
