@@ -10,6 +10,29 @@
 #include "LEDBoardGPIO.h"
 #include "DisplayDriver.h"
 
+// Change global color
+// red, green, blue -> color values to set RGB_COLOR to
+void ledSetColor(unsigned char red,unsigned char green, unsigned char blue, DisplayDriver * driver)
+{
+	(*driver).GLOBAL_COLOR.blue = blue;
+	(*driver).GLOBAL_COLOR.red = red;
+	(*driver).GLOBAL_COLOR.green = green;
+}
+
+// Set an led to the globol color
+// row, col -> position of led in array to set
+void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
+{
+	int pixel=0;
+	// find actual position in color array
+	if(row<16)
+		SETP0( pixel,  row,  col);
+	else
+		SETP1( pixel,  row-16,  col);
+
+	(*driver).CURRENT_DISP_IMAGE[pixel]=(*driver).GLOBAL_COLOR;
+}
+
 // fill the image with various colors
 void FillVary (DisplayDriver * driver)
 {
@@ -25,6 +48,13 @@ void FillVary (DisplayDriver * driver)
 			FillTeal(a+6,a+7,driver);
 			FillPurple(a+7,a+8,driver);
 		}
+}
+
+// fill with color from start pixel to end pixel
+void FillColor (unsigned char red,unsigned char green, unsigned char blue,
+						int start, int end, DisplayDriver * driver )
+{
+	// TODO < this
 }
 
 // fill with red from start pixel to end pixel

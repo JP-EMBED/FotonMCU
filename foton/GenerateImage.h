@@ -32,8 +32,11 @@ extern void FillWhite ( int start, int end, DisplayDriver * driver );
 extern void FillPurple ( int start, int end, DisplayDriver * driver );
 extern void FillTeal ( int start, int end, DisplayDriver * driver );
 extern void FillYellow ( int start, int end, DisplayDriver * driver );
-
+extern void FillColor (unsigned char red,unsigned char green, unsigned char blue, int start, int end, DisplayDriver * driver );
 extern void FillVary (DisplayDriver * driver);
+// For work with bluetooth
+extern void ledSetColor(unsigned char red,unsigned char green, unsigned char blue, DisplayDriver * driver);
+extern void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver);
 
 #define Increment( num, num2 ) \
 	num = num + 8; \

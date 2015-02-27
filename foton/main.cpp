@@ -277,7 +277,7 @@ void main()
 
     //xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
-    xTaskCreate( DisplayCurrentImage, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImageRGB, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
 
     // attempt to use bluetooth
   //  bluetooth.sendMessage("AT+UART?\r\n",22);

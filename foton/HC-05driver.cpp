@@ -25,6 +25,8 @@
 
 #include "utility_functions.h"
 #include "DisplayDriver.h"
+#include "GenerateImage.h"
+
 #define BLUETUTH_BAUD_RATE      1382400
 #define COMMAND_BAUD_RATE       38400
 #define BLUETUTHCLK             80000000
@@ -53,6 +55,7 @@
 
 void BluetoothReadTask(void * nothing)
 {
+	DisplayDriver * driver = (DisplayDriver *)nothing;
 	while(1)
 	{
 		int index(0);
@@ -75,12 +78,12 @@ void BluetoothReadTask(void * nothing)
 				{
 					case LED_SET_COLOR:
 					{
-						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3);
+						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3,driver);
 						break;
 					}
 					case LED_SET_AT:
 					{
-						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2);
+						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,driver);
 						break;
 					}
 					default:{break;}

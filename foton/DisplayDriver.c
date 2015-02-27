@@ -30,10 +30,6 @@
 #include "LEDBoardGPIO.h"
 #include "fotonrgb.h"
 
-
-void ledSetColor(unsigned char red,unsigned char green, unsigned char blue){}
-void ledSet(unsigned char row, unsigned char col){}
-
 /**********************************************************************
  *
  * the image displayed with this function, only uses rgb
@@ -42,7 +38,45 @@ void ledSet(unsigned char row, unsigned char col){}
  * This function needs to be in a continuos looop to work correctly
  *
  **********************************************************************/
-void DisplayCurrentImage(void * d)
+void DisplayCurrentImageRGB(void * d)
+{
+	DisplayDriver * driver = (DisplayDriver *)d;
+	int CURRENT_PIXEL=0;
+	int CURRENT_ROW=0;
+	while(1)
+	{
+		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
+		{
+			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
+			{
+				SETP0( (*driver).P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETP1( (*driver).P1_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETCOLOR( (*driver).IMAGE_ONEBUFF,  (*driver).P0_NUM,  (*driver).P1_NUM,  0);
+
+				//PULSECLK();
+				SETCLK();
+				// TODO < Fix delay issue here somehow
+				vTaskDelay(CLK_PULSE);
+				CLRCLK();
+			}
+
+				SETBLANK();
+						// Change Address in board to correct Address
+				SETADDR((*driver).addr[CURRENT_ROW]);
+						//UtilsDelay(500);
+						// Set Latch Signal
+				SETLATCH();
+						// Clr Latch Signal
+				CLRLATCH();
+						// Clr Blank Signal
+				CLRBLANK();
+				vTaskDelay(ALPHA_DELAY); // fetch next delay
+		}
+	}
+}
+
+// TODO this actually doing a thing
+void DisplayCurrentImageBCM(void * d)
 {
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
@@ -81,7 +115,7 @@ void DisplayCurrentImage(void * d)
 
 /**********************************************************************
  *
- * This function needs t0 be performed before outputting
+ * This function needs to be performed before outputting
  * 		any data to the LED Board.
  *
  **********************************************************************/
@@ -100,6 +134,12 @@ void ConfigureDisplayDriver(DisplayDriver * driver)
 	(*driver).ADDR=0;
 }
 
+/**********************************************************************
+ *
+ * This function needs to be performed before outputting
+ * 		any data to the LED Board.
+ *
+ **********************************************************************/
 void ConfigLEDPins(void)
 {
 	 //
