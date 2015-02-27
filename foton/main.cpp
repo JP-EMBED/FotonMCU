@@ -240,9 +240,9 @@ void main()
 
     InitTerm();
 
-    bluetooth.setLiveMode();
-    bluetooth.enableDMA();
-    bluetooth.enterTransferMode();
+   // bluetooth.setLiveMode();
+    // bluetooth.enableDMA();
+    // bluetooth.enterTransferMode();
 
 
     FOTON_LED_BOARD = &leddisplay;
