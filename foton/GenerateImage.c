@@ -63,9 +63,9 @@ void FillRed ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 1;
-		(*driver).IMAGE_ONEBUFF[a].green = 0;
-		(*driver).IMAGE_ONEBUFF[a].blue = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 0;
 	}
 }
 
@@ -75,9 +75,9 @@ void FillBlue ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 0;
-		(*driver).IMAGE_ONEBUFF[a].green = 0;
-		(*driver).IMAGE_ONEBUFF[a].blue = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 1;
 	}
 }
 
@@ -87,9 +87,9 @@ void FillGreen ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 0;
-		(*driver).IMAGE_ONEBUFF[a].green = 1;
-		(*driver).IMAGE_ONEBUFF[a].blue = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 0;
 	}
 }
 
@@ -99,9 +99,9 @@ void FillWhite ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 1;
-		(*driver).IMAGE_ONEBUFF[a].green = 1;
-		(*driver).IMAGE_ONEBUFF[a].blue = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 1;
 	}
 }
 
@@ -111,9 +111,9 @@ void FillPurple ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 1;
-		(*driver).IMAGE_ONEBUFF[a].green = 0;
-		(*driver).IMAGE_ONEBUFF[a].blue = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 1;
 	}
 }
 
@@ -123,9 +123,9 @@ void FillYellow ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 1;
-		(*driver).IMAGE_ONEBUFF[a].green = 1;
-		(*driver).IMAGE_ONEBUFF[a].blue = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 0;
 	}
 }
 
@@ -135,9 +135,9 @@ void FillTeal ( int start, int end, DisplayDriver * driver )
 	int a;
 	for (a=start; a<end; a++)
 	{
-		(*driver).IMAGE_ONEBUFF[a].red = 0;
-		(*driver).IMAGE_ONEBUFF[a].green = 1;
-		(*driver).IMAGE_ONEBUFF[a].blue = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].red = 0;
+		(*driver).CURRENT_DISP_IMAGE[a].green = 1;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = 1;
 	}
 }
 

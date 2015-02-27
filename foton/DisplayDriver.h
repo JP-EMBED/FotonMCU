@@ -89,10 +89,6 @@ extern "C"
 typedef struct DisplayDriver
 {
 	int addr[32];
-	int P0_NUM;
-	int P1_NUM;
-	int SHIFT;
-	int ADDR;
 
 	FOTON_RGB IMAGE_ONEBUFF [IMAGE_SIZE];
 	FOTON_RGB IMAGE_TWOBUFF [IMAGE_SIZE];

@@ -43,15 +43,17 @@ void DisplayCurrentImageRGB(void * d)
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
+	int PIX0=0;
+	int PIX1=0;
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
 			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
 			{
-				SETP0( (*driver).P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETP1( (*driver).P1_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETCOLOR( (*driver).IMAGE_ONEBUFF,  (*driver).P0_NUM,  (*driver).P1_NUM,  0);
+				SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  0);
 
 				//PULSECLK();
 				SETCLK();
@@ -81,15 +83,17 @@ void DisplayCurrentImageBCM(void * d)
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
+	int PIX0=0;
+	int PIX1=0;
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
 			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
 			{
-				SETP0( (*driver).P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETP1( (*driver).P1_NUM,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETCOLOR( (*driver).IMAGE_ONEBUFF,  (*driver).P0_NUM,  (*driver).P1_NUM,  0);
+				SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  0);
 
 				//PULSECLK();
 				SETCLK();
@@ -130,8 +134,6 @@ void ConfigureDisplayDriver(DisplayDriver * driver)
 
 	(*driver).CURRENT_DISP_IMAGE = (*driver).IMAGE_ONEBUFF;
 	(*driver).NEXT_DISP_IMAGE = (*driver).IMAGE_TWOBUFF;
-	(*driver).SHIFT=0;
-	(*driver).ADDR=0;
 }
 
 /**********************************************************************
