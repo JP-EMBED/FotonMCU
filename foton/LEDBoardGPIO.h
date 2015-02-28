@@ -90,8 +90,8 @@ extern "C"
 #define D_MASK 0x1
 
 // Clock Values
-#define CLK_PULSE 50 // 110 nano seconds TODO figure out actual num
-#define ALPHA_DELAY 0.5*portTICK_PERIOD_MS //2 milliseconds, time between row output
+#define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
+#define ALPHA_DELAY (portTICK_PERIOD_MS)*2000000 //2 milliseconds, time between row output
 
 //*****************************************************************************
 //

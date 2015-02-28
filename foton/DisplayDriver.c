@@ -58,7 +58,7 @@ void DisplayCurrentImageRGB(void * d)
 				//PULSECLK();
 				SETCLK();
 				// TODO < Fix delay issue here somehow
-				vTaskDelay(CLK_PULSE);
+				//vTaskDelay(CLK_PULSE);
 				CLRCLK();
 			}
 
