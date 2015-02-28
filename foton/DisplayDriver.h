@@ -251,18 +251,6 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
    else \
 	SHIFT=0; INCREMENTADDR(ADDR);}
 
-/**********************************************************************
- *
- * Increment address accordingly < TODO
- * ADDR: ccurrent row number
- *
- **********************************************************************/
-#define INCREMENTADDR( ADDR ) \
- { if ( ADDR < 16 ) \
-	ADDR++; \
-   else \
-	ADDR=0;}
-
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

@@ -214,12 +214,6 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
     bluetooth.sendMessage("Hello World?\r\n",14);
 }
 
-
-
-
-
-
-
 void main()
 {
     //
@@ -254,7 +248,7 @@ void main()
 
 
 
-    // InitializeLEDs(); //Initialize LEDS (Cannot use LEDs until moved RX and TX Uart 1 from pin_01 and pin_02
+     //InitializeLEDs(); //Initialize LEDS (Cannot use LEDs until moved RX and TX Uart 1 from pin_01 and pin_02
 
     // Configure Button one
     Button1_PTR = &button1;
@@ -275,9 +269,9 @@ void main()
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
 
-    //xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
+    xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
-    xTaskCreate( DisplayCurrentImageRGB, "DispCurImg",OSI_STACK_SIZE, NULL, 1, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImageRGB, "DispCurImg",OSI_STACK_SIZE, &leddisplay, 1, &DISP_IMG_HNDLE);
 
     // attempt to use bluetooth
   //  bluetooth.sendMessage("AT+UART?\r\n",22);
