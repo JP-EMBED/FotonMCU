@@ -45,6 +45,9 @@ void DisplayCurrentImageRGB(void * d)
 	int CURRENT_ROW=0;
 	int PIX0=0;
 	int PIX1=0;
+	TickType_t xLastWakeTime;
+	const TickType_t xFrequency = ALPHA_DELAY;
+	xLastWakeTime = xTaskGetTickCount();
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
@@ -72,7 +75,8 @@ void DisplayCurrentImageRGB(void * d)
 				CLRLATCH();
 						// Clr Blank Signal
 				CLRBLANK();
-				vTaskDelay(ALPHA_DELAY); // fetch next delay
+				//vTaskDelay(ALPHA_DELAY); // fetch next delay
+				vTaskDelayUntil( &xLastWakeTime, xFrequency );
 		}
 	}
 }

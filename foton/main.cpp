@@ -225,6 +225,7 @@ void main()
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
 	FillVary(&leddisplay);
+	//InitStartImage(&leddisplay);
 	ConfigLEDPins();
 
 
@@ -269,7 +270,7 @@ void main()
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
 
-    xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
+   // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
     xTaskCreate( DisplayCurrentImageRGB, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 1, &DISP_IMG_HNDLE);
 
