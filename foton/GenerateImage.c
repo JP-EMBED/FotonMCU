@@ -54,7 +54,13 @@ void FillVary (DisplayDriver * driver)
 void FillColor (unsigned char red,unsigned char green, unsigned char blue,
 						int start, int end, DisplayDriver * driver )
 {
-	// TODO < this
+	int a;
+	for (a=start; a<end; a++)
+	{
+		(*driver).CURRENT_DISP_IMAGE[a].red = red;
+		(*driver).CURRENT_DISP_IMAGE[a].green = green;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = blue;
+	}
 }
 
 // fill with red from start pixel to end pixel

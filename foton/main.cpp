@@ -224,10 +224,9 @@ void main()
 	// TODO Add configure calls back after BCM Driver works a bit.
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
-	FillVary(&leddisplay);
-	//InitStartImage(&leddisplay);
+	//FillVary(&leddisplay);
+	InitStartImage(&leddisplay);
 	ConfigLEDPins();
-
 
 	// initi the clock the first time.
 	//PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
