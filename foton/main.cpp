@@ -225,7 +225,9 @@ void main()
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
 	//FillVary(&leddisplay);
-	InitStartImage(&leddisplay);
+	//InitStartImage(&leddisplay);
+	// red, green, blue, start, end, driver
+	FillColor(153,0,76,0,1024, &leddisplay);
 	ConfigLEDPins();
 
 	// initi the clock the first time.
@@ -271,7 +273,7 @@ void main()
 
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
-    xTaskCreate( DisplayCurrentImageRGB, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 1, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 1, &DISP_IMG_HNDLE);
 
     // attempt to use bluetooth
   //  bluetooth.sendMessage("AT+UART?\r\n",22);
