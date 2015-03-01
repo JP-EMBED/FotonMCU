@@ -87,36 +87,42 @@ void DisplayCurrentImageBCM(void * d)
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
+	int SHIFT=0;
 	int PIX0=0;
 	int PIX1=0;
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
-			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
+			for (SHIFT=0;SHIFT<8;SHIFT++)
 			{
-				SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  0);
+				for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
+				{
+					SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
+					SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
+					SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  SHIFT);
 
-				//PULSECLK();
-				SETCLK();
-				// TODO < Fix delay issue here somehow
-				vTaskDelay(CLK_PULSE);
-				CLRCLK();
+					//PULSECLK();
+					SETCLK();
+					// TODO < Fix delay issue here somehow
+					//vTaskDelay(CLK_PULSE);
+					CLRCLK();
+				}
+
+					SETBLANK();
+							// Change Address in board to correct Address
+					SETADDR((*driver).addr[CURRENT_ROW]);
+							//UtilsDelay(500);
+							// Set Latch Signal
+					SETLATCH();
+							// Clr Latch Signal
+					CLRLATCH();
+							// Clr Blank Signal
+					CLRBLANK();
+					//vTaskDelay(ALPHA_DELAY); // fetch next delay
+					vTaskDelay( SHIFT_DELAY << SHIFT );
 			}
-
-				SETBLANK();
-						// Change Address in board to correct Address
-				SETADDR((*driver).addr[CURRENT_ROW]);
-						//UtilsDelay(500);
-						// Set Latch Signal
-				SETLATCH();
-						// Clr Latch Signal
-				CLRLATCH();
-						// Clr Blank Signal
-				CLRBLANK();
-				vTaskDelay(ALPHA_DELAY); // fetch next delay
+			vTaskDelay( ALPHA_DELAY );
 		}
 	}
 }
