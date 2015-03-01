@@ -92,7 +92,7 @@ extern "C"
 // Clock Values
 #define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
 #define ALPHA_DELAY 1/(portTICK_PERIOD_MS) //1 millisecond, time between row output
-#define SHIFT_DELAY 1/(portTICK_PERIOD_MS*1000000)
+#define SHIFT_DELAY 1/(portTICK_PERIOD_MS*100)
 
 //*****************************************************************************
 //

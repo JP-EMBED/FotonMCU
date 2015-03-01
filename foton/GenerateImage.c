@@ -33,6 +33,32 @@ void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
 	(*driver).CURRENT_DISP_IMAGE[pixel]=(*driver).GLOBAL_COLOR;
 }
 
+void SetPurpleGradient( DisplayDriver * driver )
+{
+	int a=0;
+	int i=0;
+	int div=0;
+	int r=255;
+	int b=255;
+	int g=255;
+
+	int r2=0;
+	int b2=0;
+	int g2=0;
+
+	for(;a<1024;r-=8,b-=8,g-=8)
+	{
+		div = g/32;
+		for(r2=r,g2=g,b2=b,i=0; i<32 ;r2-=1,g2-=div,i+=1)
+		{
+			(*driver).CURRENT_DISP_IMAGE[a].red = r2;
+			(*driver).CURRENT_DISP_IMAGE[a].green = g2;
+			(*driver).CURRENT_DISP_IMAGE[a].blue = b2;
+			a++;
+		}
+	}
+}
+
 // fill the image with various colors
 void FillVary (DisplayDriver * driver)
 {
@@ -210,9 +236,9 @@ void InitStartImage(DisplayDriver * driver)
 		{
 		FillGreen( curstrt, curend, driver );
 		Increment(curstrt,curend);
-		FillRed( curstrt, curend, driver );
+		FillColor(255,0,255, curstrt, curend, driver );
 		Increment(curstrt,curend);
-		FillRed( curstrt, curend, driver );
+		FillColor(255,0,255, curstrt, curend, driver );
 		Increment(curstrt,curend);
 		FillGreen( curstrt, curend, driver );
 		Increment(curstrt,curend);
