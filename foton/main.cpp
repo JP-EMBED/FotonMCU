@@ -225,9 +225,9 @@ void main()
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
 	//FillVary(&leddisplay);
-	 InitStartImage(&leddisplay);
+	// InitStartImage(&leddisplay);
 	// red, green, blue, start, end, driver
-	// FillColor(0,128,128,0,1024, &leddisplay);
+	 FillColor(0,0,0,0,1024, &leddisplay);
 	//SetPurpleGradient( &leddisplay );
 	ConfigLEDPins();
 

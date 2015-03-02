@@ -150,7 +150,7 @@ void ConfigureDisplayDriver(DisplayDriver * driver)
 
 	(*driver).CURRENT_DISP_IMAGE = (*driver).IMAGE_ONEBUFF;
 	(*driver).NEXT_DISP_IMAGE = (*driver).IMAGE_TWOBUFF;
-	(*driver).GLOBAL_COLOR.red=0;
+	(*driver).GLOBAL_COLOR.red=255;
 	(*driver).GLOBAL_COLOR.green=0;
 	(*driver).GLOBAL_COLOR.blue=0;
 }
