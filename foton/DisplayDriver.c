@@ -1,14 +1,20 @@
 /************************************************************************
 * file: DisplayDriver.c
 * author: Kat Derby
-* Revision: 1.0
-* Last Revision Date: 2/18/2015
+* Revision: 2.0
+* Last Revision Date: 3/1/2015
 *
 * Defined Functions:
 *		- Defined functions that allow for functionality of the LED Board
 *
-*		DisplayImage
-*			- Displays a 1064 pixel image to the LED board
+*		DisplayCurrentImageRGB(void * d)
+*			RGB image driver task, only allows for simple RGB values
+*		DisplayCurrentImageBCM(void * d)
+*			BCM image driver task, allows for wide range of colors
+*		ConfigureDisplayDriver(DisplayDriver * driver)
+*			Initializes DisplayDriver values to default values
+*		ConfigLEDPins(void)
+*			Sets up the pins for driving the led display board
 *
 *************************************************************************/
 #include "FreeRTOS.h"
@@ -144,7 +150,9 @@ void ConfigureDisplayDriver(DisplayDriver * driver)
 
 	(*driver).CURRENT_DISP_IMAGE = (*driver).IMAGE_ONEBUFF;
 	(*driver).NEXT_DISP_IMAGE = (*driver).IMAGE_TWOBUFF;
-
+	(*driver).GLOBAL_COLOR.red=0;
+	(*driver).GLOBAL_COLOR.green=0;
+	(*driver).GLOBAL_COLOR.blue=0;
 }
 
 /**********************************************************************

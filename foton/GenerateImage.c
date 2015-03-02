@@ -1,11 +1,44 @@
-/*
- * GenerateImage.c
- *
- *  Created on: Feb 25, 2015
- *      Author: Kat
- */
-
-
+/************************************************************************
+* file: GenerateImage.c
+* author: Kat Derby
+* Revision: 2.0
+* Last Revision Date: 3/1/2015
+*
+* Defined Functions:
+*		- Defined functions that allow for generation of images
+*
+*		void ledSetColor(unsigned char red,unsigned char green, unsigned char blue, DisplayDriver * driver)
+*			sets the color of the GlobalColor
+*		void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
+*			sets an led in the array being currently displayed to the GlobalColor
+*
+*		FillRed( int start, int end, DisplayDriver * driver )
+*			fill with red from start pixel to end pixel
+*		FillGreen( int start, int end, DisplayDriver * driver )
+*			fill with green from start pixel to end pixel
+*		FillBlue( int start, int end, DisplayDriver * driver )
+*			fill with blue from start pixel to end pixel
+*		FillPurple( int start, int end, DisplayDriver * driver )
+*			fill with purple from start pixel to end pixel
+*		FillYellow( int start, int end, DisplayDriver * driver )
+*			fill with yellow from start pixel to end pixel
+*		FillTeal( int start, int end, DisplayDriver * driver )
+*			fill with teal from start pixel to end pixel
+*		FillWhite( int start, int end, DisplayDriver * driver )
+*			fill with white from start pixel to end pixel
+*
+*		FillColor (unsigned char red,unsigned char green, unsigned char blue,
+*						int start, int end, DisplayDriver * driver )
+*			fill with specified color from start pixel to end pixel
+*
+*		FillVary( DisplayDriver * driver )
+*			Fill the whole image with a set pattern of colors
+*		SetPurpleGradient( DisplayDriver * driver )
+*			Fill the whole image with a purple gradient
+*		InitStartImage(DisplayDriver * driver)
+*			Fill image with a starting image
+*
+*************************************************************************/
 #include "GenerateImage.h"
 #include "LEDBoardGPIO.h"
 #include "DisplayDriver.h"

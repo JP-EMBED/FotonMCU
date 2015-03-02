@@ -1,8 +1,8 @@
 /************************************************************************
 * file: DisplayDriver.h
 * author: Kat Derby
-* Revision: 1.2
-* Last Revision Date: 2/19/2015
+* Revision: 2.0
+* Last Revision Date: 3/1/2015
 *
 * Macro Functions:
 *	- Macros used in sending data out to the LED board
