@@ -55,7 +55,6 @@
 
 void BluetoothReadTask(void * nothing)
 {
-	DisplayDriver * driver = (DisplayDriver *)nothing;
 	while(1)
 	{
 		int index(0);
@@ -78,12 +77,12 @@ void BluetoothReadTask(void * nothing)
 				{
 					case LED_SET_COLOR:
 					{
-						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3,driver);
+						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3,FOTON_LED_BOARD);
 						break;
 					}
 					case LED_SET_AT:
 					{
-						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,driver);
+						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,FOTON_LED_BOARD);
 						break;
 					}
 					default:{break;}

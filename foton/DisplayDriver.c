@@ -144,6 +144,7 @@ void ConfigureDisplayDriver(DisplayDriver * driver)
 
 	(*driver).CURRENT_DISP_IMAGE = (*driver).IMAGE_ONEBUFF;
 	(*driver).NEXT_DISP_IMAGE = (*driver).IMAGE_TWOBUFF;
+
 }
 
 /**********************************************************************
@@ -206,10 +207,11 @@ void ConfigLEDPins(void)
 	    GPIODirModeSet(GPIOA2_BASE, 0x40, GPIO_DIR_MODE_OUT);
 
 	    //
-	    // Configure PIN_01 for GPIO Output
+	    // Configure PIN_07 for GPIO Output
 	    // BLANK
-	    PinTypeGPIO(PIN_01, PIN_MODE_0, false);
-	    GPIODirModeSet(GPIOA1_BASE, 0x4, GPIO_DIR_MODE_OUT);
+	    PinTypeGPIO(PIN_07, PIN_MODE_0, false);
+	    GPIODirModeSet(GPIOA2_BASE, 0x1, GPIO_DIR_MODE_OUT);
+
 
 	    //
 	    // Configure PIN_03 for GPIO Output
@@ -236,6 +238,6 @@ void ConfigLEDPins(void)
 	    GPIODirModeSet(GPIOA3_BASE, 0x40, GPIO_DIR_MODE_OUT);
 
 	    // CLK
-	    PinTypeGPIO(PIN_02, PIN_MODE_0, false);
-	    GPIODirModeSet(GPIOA1_BASE, 0x8, GPIO_DIR_MODE_OUT);
+	    PinTypeGPIO(PIN_08, PIN_MODE_0, false);
+	    GPIODirModeSet(GPIOA2_BASE, 0x2, GPIO_DIR_MODE_OUT);
 }

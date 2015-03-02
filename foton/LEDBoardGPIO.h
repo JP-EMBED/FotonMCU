@@ -38,8 +38,8 @@ extern "C"
 // bit packed pin representation for each signal
 // Control Signals
 #define LATCH_PIN 0x01
-#define BLANK_PIN 0x04
-#define CLK_PIN 0x08
+#define BLANK_PIN 0x01
+#define CLK_PIN 0x02
 
 // Color Coding Signals
 // Top Rows
@@ -62,9 +62,8 @@ extern "C"
 // Ports for each signal
 // Control Signals
 #define LATCH_PORT GPIOA0_BASE
-#define BLANK_PORT GPIOA1_BASE
-#define CLK_PORT GPIOA1_BASE
-#define PWM_PORT TIMERA3_BASE
+#define BLANK_PORT GPIOA2_BASE
+#define CLK_PORT GPIOA2_BASE
 
 // Color Coding Signals
 // Top Rows

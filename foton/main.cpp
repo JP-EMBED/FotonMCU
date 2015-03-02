@@ -225,7 +225,7 @@ void main()
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
 	//FillVary(&leddisplay);
-	InitStartImage(&leddisplay);
+	 InitStartImage(&leddisplay);
 	// red, green, blue, start, end, driver
 	// FillColor(0,128,128,0,1024, &leddisplay);
 	//SetPurpleGradient( &leddisplay );
@@ -237,9 +237,9 @@ void main()
 
     InitTerm();
 
-   // bluetooth.setLiveMode();
-    // bluetooth.enableDMA();
-    // bluetooth.enterTransferMode();
+    bluetooth.setLiveMode();
+    bluetooth.enableDMA();
+    bluetooth.enterTransferMode();
 
 
     FOTON_LED_BOARD = &leddisplay;
@@ -273,7 +273,7 @@ void main()
     button2.enableInterrupt();
 
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
-
+    xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
     xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 1, &DISP_IMG_HNDLE);
 
     // attempt to use bluetooth

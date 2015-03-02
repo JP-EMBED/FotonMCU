@@ -238,19 +238,6 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
  HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = CLK_PIN; \
  HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = 0
 
- /**********************************************************************
- *
- * Increment pixel shift for current row accordingly < TODO
- * SHIFT: current bit placement in color byte
- * ADDR: current row number
- *
- **********************************************************************/
- #define INCREMTENTSHIFT( SHIFT, ADDR ) \
- { if ( SHIFT < 8 ) \
-	SHIFT++; \
-   else \
-	SHIFT=0; INCREMENTADDR(ADDR);}
-
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.
