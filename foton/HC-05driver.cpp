@@ -24,9 +24,7 @@
 #include "interrupt.h"
 
 #include "utility_functions.h"
-#include "DisplayDriver.h"
 #include "GenerateImage.h"
-
 #define BLUETUTH_BAUD_RATE      1382400
 #define COMMAND_BAUD_RATE       38400
 #define BLUETUTHCLK             80000000
@@ -51,52 +49,127 @@
 
 //HC_05Bluetooth FotonHC_05Bluetooth;
 
+QueueHandle_t  AT_COMMAND_QUEUE = NULL;
+
+const char * COMMAND_STR_TABLE[] = {"","","","","","","","","","",
+									"","","","","","","","","","",
+									"","","","","","","","","","",
+									"","","","","","","",};
+
+/*******************************************************************
+ * Bluetooth INTERRUPT HANDLER - Handles all RXDMA Messages
+ *
+ */
+void BlueToothInterruptHandler()
+{
+	unsigned long ulstatus =  UARTIntStatus(BLUETOOTH,true);
+
+    // Only Fires For UART_INT_DMARX
+	if(UARTCharsAvail(BLUETOOTH))
+	{
+		FOTON_BLUETOOTH->BackIndex+= 2; // THE DMA ALREADY TRANSFERED 4 bytes
+		if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX ) // Ring buffer, check end
+			FOTON_BLUETOOTH->BackIndex = (FOTON_BLUETOOTH->BackIndex - MAX_COMMAND_INDEX); // adjust index
+
+		// Grab any characters left in the fifo (or are comming in live)
+		while(UARTCharsAvail(BLUETOOTH))
+		{
+			RXDATABUFF[FOTON_BLUETOOTH->BackIndex++] = UARTCharGet(BLUETOOTH); // stuff in Ring Buffer
+			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
+					FOTON_BLUETOOTH->BackIndex = 0;
+		}
+		BaseType_t xYieldRequired;
+		xYieldRequired = xTaskResumeFromISR(BLUETOOTH_READ_HNDLE);
+		portYIELD_FROM_ISR(xYieldRequired);
+
+		// Reconfigure DMA for next transfer
+		SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
+				       UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
+			           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
+	}
+	UARTIntClear(BLUETOOTH,UART_INT_DMARX | UART_INT_EOT); // Clear the interrupt
+}
 
 
+
+/**************************************************************
+ * FOTON Bluetooth TASKS
+ *
+ */
 void BluetoothReadTask(void * nothing)
 {
 	while(1)
 	{
 		int index(0);
-		if((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
+		while(abs(FOTON_BLUETOOTH->FrontIndex - FOTON_BLUETOOTH->BackIndex) > 4)
 		{
-			while((FOTON_BLUETOOTH->FrontIndex != FOTON_BLUETOOTH->BackIndex))
-			{
-				CURRENT_MESSAGE->FUNC_CTRL = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+				CURRENT_MESSAGE->FUNC_CTRL = RXDATABUFF[FOTON_BLUETOOTH->FrontIndex++];
 				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
 					FOTON_BLUETOOTH->FrontIndex = 0;
-			    CURRENT_MESSAGE->DATA1 = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+			    CURRENT_MESSAGE->DATA1 = RXDATABUFF[FOTON_BLUETOOTH->FrontIndex++];
 				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
 					FOTON_BLUETOOTH->FrontIndex = 0;
-			    CURRENT_MESSAGE->DATA2 = RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+			    CURRENT_MESSAGE->DATA2 = RXDATABUFF[FOTON_BLUETOOTH->FrontIndex++];
 				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
 					FOTON_BLUETOOTH->FrontIndex = 0;
-			    CURRENT_MESSAGE->DATA3 =  RXDATABUFF[++FOTON_BLUETOOTH->FrontIndex];
+			    CURRENT_MESSAGE->DATA3 =  RXDATABUFF[FOTON_BLUETOOTH->FrontIndex++];
+				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
+					FOTON_BLUETOOTH->FrontIndex = 0;
 
 				switch(CURRENT_MESSAGE->FUNC_CTRL)
 				{
 					case LED_SET_COLOR:
 					{
-						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3,FOTON_LED_BOARD);
+						ledSetColor(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA3, FOTON_LED_BOARD);
 						break;
 					}
 					case LED_SET_AT:
 					{
-						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2,FOTON_LED_BOARD);
+						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2, FOTON_LED_BOARD);
+						break;
+					}
+					case LED_CLEAR:
+					{
+						FillColor(0,0,0,0,1024,FOTON_LED_BOARD);
+						//ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2, FOTON_LED_BOARD);
 						break;
 					}
 					default:{break;}
 				}
-				++FOTON_BLUETOOTH->FrontIndex;
-				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
-					FOTON_BLUETOOTH->FrontIndex = 0;
-			}
 		}
-		vTaskDelay(30 * portTICK_PERIOD_MS); // sleep 30 milliseconds
+		vTaskSuspend(NULL); // sleep 30 milliseconds
+	}
+}
+void BluetoothATRequestTask(void * nothing)
+{
+	BLUETOOTH_AT_REQUEST * at_command_request;
+	if(AT_COMMAND_QUEUE)
+	{
+		for(;;)
+		{
+			if(xQueueReceive(AT_COMMAND_QUEUE, &(at_command_request),portMAX_DELAY))
+			{
+				// process the request
+				FOTON_BLUETOOTH->enterConfigureMode();
+				vTaskDelay(900/portTICK_PERIOD_MS);
+				const char * command = COMMAND_STR_TABLE[at_command_request->CommandID];
+				FOTON_BLUETOOTH->sendMessage(command,60);
+				xQueueReceive(AT_COMMAND_QUEUE, &(at_command_request),portMAX_DELAY);
+
+			}// else block yourself until something arrives
+		}
 	}
 }
 
-void BluetoothProcessATTask(void*nothing)
+void BluetoothPowerCycleTask(void * nothing)
+{
+	FOTON_BLUETOOTH->setPowerOn(false);
+	vTaskDelay( 10000 / portTICK_PERIOD_MS );
+	FOTON_BLUETOOTH->setPowerOn(true);
+	vTaskDelete(NULL);
+}
+
+void BluetoothProcessATReplyTask(void*nothing)
 {
 	while(1)
 	{
@@ -123,42 +196,16 @@ void BluetoothProcessATTask(void*nothing)
 			//UARTIntEnable(BLUETOOTH, UART_INT_DMARX);
 			//UARTDMAEnable(BLUETOOTH, UART_DMA_RX);
 		}
-		vTaskDelay(30 * portTICK_PERIOD_MS); // sleep 30 milliseconds
+		vTaskDelay(30 / portTICK_PERIOD_MS); // sleep 30 milliseconds
 	}
 }
 
 
-void BlueToothInterruptHandler()
-{
-	unsigned long ulstatus =  UARTIntStatus(BLUETOOTH,true);
 
-    // Only Fires For UART_INT_DMARX
-	if(UARTCharsAvail(BLUETOOTH))
-	{
-		FOTON_BLUETOOTH->BackIndex+= 4; // THE DMA ALREADY TRANSFERED 4 bytes
-		if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX ) // Ring buffer, check end
-			FOTON_BLUETOOTH->BackIndex = (FOTON_BLUETOOTH->BackIndex - MAX_COMMAND_INDEX); // adjust index
-
-		// Grab any characters left in the fifo (or are comming in live)
-		while(UARTCharsAvail(BLUETOOTH))
-		{
-			RXDATABUFF[FOTON_BLUETOOTH->BackIndex++] = UARTCharGet(BLUETOOTH); // stuff in Ring Buffer
-			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
-					FOTON_BLUETOOTH->BackIndex = 0;
-		}
-
-		// Reconfigure DMA for next transfer
-		SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,4,UDMA_SIZE_8,
-				       UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
-			           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
-	}
-	UARTIntClear(BLUETOOTH,UART_INT_DMARX); // Clear the interrupt
-
-
-}
-
-
-
+/*******************************************************************
+ * HC_05 Bluetooth class definition
+ *
+ */
 
 HC_05Bluetooth::HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
 							   unsigned char TX_pin,unsigned long TX_Mode,
@@ -169,7 +216,8 @@ HC_05Bluetooth::HC_05Bluetooth(unsigned char RX_pin,unsigned long RX_Mode,
 	PRCMPeripheralReset(BLUETOOTH_PERIPH);
 	PRCMPeripheralClkEnable(BLUETOOTH_PERIPH, PRCM_RUN_MODE_CLK);
 
-
+	if(AT_COMMAND_QUEUE == NULL)
+		AT_COMMAND_QUEUE = xQueueCreate(4, sizeof(BLUETOOTH_AT_REQUEST));
 
 	// Set up TX and RX pins
 	PinTypeUART(TX_pin,TX_Mode);
@@ -201,7 +249,7 @@ void HC_05Bluetooth::enableDMA()
 {
 	uDMAChannelAssign(RX_DMA_CHANNEL);
 	uDMAChannelAssign(TX_DMA_CHANNEL);
-    UARTIntEnable(BLUETOOTH,  UART_INT_DMARX);
+    UARTIntEnable(BLUETOOTH,  UART_INT_DMARX | UART_INT_EOT);
 
     UARTDMAEnable(BLUETOOTH, UART_DMA_RX );
     IntRegister(BLUETOOTH_INT, BlueToothInterruptHandler);
@@ -213,6 +261,12 @@ void HC_05Bluetooth::configureDMATransfers( bool livemode )
 
 }
 
+
+void HC_05Bluetooth::powerCycle()
+{
+
+	xTaskCreate( BluetoothPowerCycleTask, "",64, NULL, 1, NULL);
+}
 
 void HC_05Bluetooth::setLiveMode()
 {
@@ -230,7 +284,7 @@ void HC_05Bluetooth::setLiveMode()
 	// Receive the Data
 	FrontIndex = 0;
 	BackIndex = 0;
-	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,4,UDMA_SIZE_8,
+	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
 		           UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
 		           UDMA_SRC_INC_NONE,RXDATABUFF,UDMA_DST_INC_8);
 
@@ -269,32 +323,30 @@ void HC_05Bluetooth::disable()
 	}
 }
 
+// Should always attempt to sleep for a second or more after changing modes
 void HC_05Bluetooth::enterConfigureMode()
 {
 	// Disable the bluetooth and raise State pin
-	disable();
+	//disable();
 	GPIOPinWrite(mStatePortAddress,mStatePinAddress, mStatePinAddress);
-	setPowerOn(false);
+	//setPowerOn(false);
 	waitForModeChange();
 
 	// set baud to 38400
-	UARTConfigSetExpClk(BLUETOOTH,BLUETUTHCLK,COMMAND_BAUD_RATE,
-		               (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+	//UARTConfigSetExpClk(BLUETOOTH,BLUETUTHCLK,COMMAND_BAUD_RATE,
+	//	               (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 	// Power bluetooth back on
-	setPowerOn(true);
+	//setPowerOn(true);
 	waitForModeChange();
 
 	// If transfer task exists, delete it and create command task
 	if(BLUETOOTH_READ_HNDLE)
+	{
 		vTaskDelete(BLUETOOTH_READ_HNDLE);
-	xTaskCreate( BluetoothProcessATTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_CMD_READ_HNDLE);
-	enable(); // enabled once again
-
-	// Sleep for a while to let HC-05 restart
-	waitForModeChange();
-	waitForModeChange();
-	waitForModeChange();
-	waitForModeChange();
+		BLUETOOTH_READ_HNDLE = 0;
+	}
+	xTaskCreate( BluetoothProcessATReplyTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_CMD_READ_HNDLE);
+	//enable(); // enabled once again
 	mTransferModeEnabled = false;
 
 }
@@ -314,6 +366,7 @@ void HC_05Bluetooth::waitForModeChange()
 				"    nop\n");
 }
 
+// Should always attempt to sleep for a second or more after changing modes
 void HC_05Bluetooth::enterTransferMode()
 {
 
@@ -333,17 +386,35 @@ void HC_05Bluetooth::enterTransferMode()
 	setPowerOn(true);
 	waitForModeChange();
 	if(BLUETOOTH_CMD_READ_HNDLE)
+	{
 		vTaskDelete(BLUETOOTH_CMD_READ_HNDLE);
+		BLUETOOTH_CMD_READ_HNDLE = 0;
+	}
 	xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
 	enable();
-	waitForModeChange();
-	waitForModeChange();
-	waitForModeChange();
-	waitForModeChange();
 	mTransferModeEnabled = true;
 
 }
 
+void HC_05Bluetooth::getCommand(HC_05_AT_COMMAND command_type, unsigned short caller_id)
+{
+	BLUETOOTH_AT_REQUEST * at_command = 0;
+	switch(command_type)
+	{
+		case GetMasterName:
+		{
+			at_command = new BLUETOOTH_AT_REQUEST(caller_id, command_type);
+			break;
+		}
+		default: break;
+	}
+	if(xQueueSendToBack(AT_COMMAND_QUEUE, (void*)at_command,0) != pdTRUE)
+	{
+		Report("Error Fetching AT_COMMAND: %s", COMMAND_STR_TABLE[command_type]);
+		delete at_command;
+	}
+	WaitingForResponse = true;
+}
 
 void HC_05Bluetooth::processATCommandResponse(char command[], int last_index)
 {

@@ -15,7 +15,8 @@
 #define MAX_COMMAND_INDEX 300
 #include "hw_types.h"
 #include "udma.h"
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
+#include <queue.h>
 #include "ButtonDriver.h"
 
 
@@ -26,6 +27,10 @@ typedef struct FOTON_LIVE_MESSAGE
     unsigned char DATA2;
     unsigned char DATA3;
 }FOTON_LIVE_MESSAGE;
+
+
+
+
 
 
 enum FUNCTIONS_MAJOR
@@ -65,7 +70,7 @@ enum HC_05_PARSE_STATES
 extern void BlueToothInterruptHandler();
 
 
-enum HC_05_AT_COMMANDS
+enum HC_05_AT_COMMAND
 {
 	Test = 0,
 	Reset,
@@ -104,9 +109,18 @@ enum HC_05_AT_COMMANDS
     DropCurrentDevice,
     EnterHibernate,
     ExitEnergyMode,
-    GetDisconnecType
+    GetDisconnectType
 };
 
+typedef struct BLUETOOTH_AT_REQUEST
+{
+	unsigned short   CallerID;
+	HC_05_AT_COMMAND CommandID;
+	BLUETOOTH_AT_REQUEST(unsigned short callerid, HC_05_AT_COMMAND commandid)
+		: CallerID(callerid), CommandID(commandid)
+	{}
+
+}BLUETOOTH_AT_REQUEST;
 
 enum HC_05_Errors
 {
@@ -138,6 +152,7 @@ public:
 	void sendMessage(const char * message, unsigned int length);
 	void processATCommandResponse(char command[], int last_index);
 	void setPowerOn(bool power_on = true);
+	void powerCycle();
 	// Bluetooth AT Config Commands Specific to the HC-05 bluetooth
 	void setATCommand(const char * command){
 		WaitingForResponse = true;
@@ -146,9 +161,7 @@ public:
 		WaitingForResponse = true;
 	}
 
-	void getCommand(char * buffer){
-		WaitingForResponse = true;
-	}
+	void getCommand(HC_05_AT_COMMAND command_type, unsigned short caller_id);
 
 	void setCommand(char * buffer){
 		WaitingForResponse = true;
@@ -156,6 +169,8 @@ public:
 
 	void setLiveMode();
 	void setOtherMode();
+
+	void waitForModeChange(void);
 
 	/*bool testAT(){return false;}
 	bool resetBluetooth(){return false;}
@@ -202,7 +217,6 @@ public:
 	unsigned short  BackIndex;
 	bool isTransfering() {return mTransferModeEnabled;}
 private:
-	void waitForModeChange(void);
 
 	unsigned short  MessageCount;
 	bool            WaitingForResponse;
@@ -226,9 +240,11 @@ private:
 
 extern char RXDATABUFF[MAX_COMMAND_INDEX];
 extern HC_05Bluetooth *  FOTON_BLUETOOTH;
+extern const char *      COMMAND_STR_TABLE[GetDisconnectType];
 extern void BluetoothReadTask(void *);
 extern void BluetoothProcessATTask(void*);
 extern TaskHandle_t BLUETOOTH_READ_HNDLE;
 extern TaskHandle_t BLUETOOTH_CMD_READ_HNDLE;
 extern FOTON_LIVE_MESSAGE * CURRENT_MESSAGE;
+extern QueueHandle_t        AT_COMMAND_QUEUE;
 #endif /* HC_05DRIVER_HPP_ */

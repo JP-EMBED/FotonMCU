@@ -126,7 +126,7 @@ void DisplayCurrentImageBCM(void * d)
 							// Clr Blank Signal
 					CLRBLANK();
 					//vTaskDelay(ALPHA_DELAY); // fetch next delay
-					vTaskDelay( SHIFT_DELAY << SHIFT );
+					vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
 			}
 			vTaskDelay( ALPHA_DELAY );
 		}

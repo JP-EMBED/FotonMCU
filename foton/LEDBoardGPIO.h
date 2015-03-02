@@ -38,7 +38,7 @@ extern "C"
 // bit packed pin representation for each signal
 // Control Signals
 #define LATCH_PIN 0x01
-#define BLANK_PIN 0x01
+#define BLANK_PIN 0x02
 #define CLK_PIN 0x02
 
 // Color Coding Signals
@@ -62,7 +62,7 @@ extern "C"
 // Ports for each signal
 // Control Signals
 #define LATCH_PORT GPIOA0_BASE
-#define BLANK_PORT GPIOA2_BASE
+#define BLANK_PORT GPIOA3_BASE
 #define CLK_PORT GPIOA2_BASE
 
 // Color Coding Signals
@@ -91,7 +91,7 @@ extern "C"
 // Clock Values
 #define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
 #define ALPHA_DELAY 1/(portTICK_PERIOD_MS) //1 millisecond, time between row output
-#define SHIFT_DELAY 1/(portTICK_PERIOD_MS*100)
+#define SHIFT_DELAY 8/1000000
 
 //*****************************************************************************
 //
