@@ -231,7 +231,7 @@ void main()
 	//SetPurpleGradient( &leddisplay );
 	ConfigLEDPins();
 
-	// initi the clock the first time.
+	// initial the clock the first time.
 	//PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
 
 
