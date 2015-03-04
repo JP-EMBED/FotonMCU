@@ -11,6 +11,9 @@
 *			sets the color of the GlobalColor
 *		void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
 *			sets an led in the array being currently displayed to the GlobalColor
+*		void ledFill(int start, int end, DisplayDriver * driver)
+*			sets a line of colors in the array to the GlobalColor
+*			this line goes from start to end-1
 *
 *		FillRed( int start, int end, DisplayDriver * driver )
 *			fill with red from start pixel to end pixel
@@ -64,6 +67,19 @@ void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
 		SETP1( pixel,  row-16,  col);
 
 	(*driver).CURRENT_DISP_IMAGE[pixel]=(*driver).GLOBAL_COLOR;
+}
+
+// Sets a line of colors in the array to the GlobalColor
+// This line goes from start to end-1
+void ledFill(int start, int end, DisplayDriver * driver)
+{
+	int a;
+	for (a=start; a<end; a++)
+	{
+		(*driver).CURRENT_DISP_IMAGE[a].red = (*driver).GLOBAL_COLOR.red;
+		(*driver).CURRENT_DISP_IMAGE[a].green = (*driver).GLOBAL_COLOR.green;
+		(*driver).CURRENT_DISP_IMAGE[a].blue = (*driver).GLOBAL_COLOR.blue;
+	}
 }
 
 void SetPurpleGradient( DisplayDriver * driver )

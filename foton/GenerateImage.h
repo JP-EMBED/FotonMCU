@@ -38,6 +38,7 @@ extern void SetPurpleGradient( DisplayDriver * driver );
 // For work with bluetooth
 extern void ledSetColor(unsigned char red,unsigned char green, unsigned char blue, DisplayDriver * driver);
 extern void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver);
+extern void ledFill(int start, int end, DisplayDriver * driver);
 
 #define Increment( num, num2 ) \
 	num = num + 8; \
