@@ -215,10 +215,10 @@ void ConfigLEDPins(void)
 	    GPIODirModeSet(GPIOA2_BASE, 0x40, GPIO_DIR_MODE_OUT);
 
 	    //
-	    // Configure PIN_07 for GPIO Output
+	    // Configure PIN_21 for GPIO Output
 	    // BLANK
-	    PinTypeGPIO(PIN_07, PIN_MODE_0, false);
-	    GPIODirModeSet(GPIOA2_BASE, 0x1, GPIO_DIR_MODE_OUT);
+	    PinTypeGPIO(PIN_21, PIN_MODE_0, false);
+	    GPIODirModeSet(GPIOA3_BASE, 0x2, GPIO_DIR_MODE_OUT);
 
 
 	    //
