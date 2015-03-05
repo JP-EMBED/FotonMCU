@@ -61,11 +61,7 @@ void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver)
 {
 	int pixel=0;
 	// find actual position in color array
-	if(row<16)
-		SETP0( pixel,  row,  col);
-	else
-		SETP1( pixel,  row-16,  col);
-
+	pixel = row *32 + col;
 	(*driver).CURRENT_DISP_IMAGE[pixel]=(*driver).GLOBAL_COLOR;
 }
 

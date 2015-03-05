@@ -134,7 +134,44 @@ extern "C" void vAssertCalled( const char *pcFile, unsigned long ulLine )
 //*****************************************************************************
 extern "C" void vApplicationIdleHook( void)
 {
-    //Handle Idle Hook for Profiling, Power Management etc
+
+	int CURRENT_PIXEL=0;
+	int CURRENT_ROW=0;
+	int SHIFT=0;
+	int PIX0=0;
+	int PIX1=0;
+
+	for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
+	{
+		for (SHIFT=0;SHIFT<8;SHIFT++)
+		{
+			for (CURRENT_PIXEL=0; CURRENT_PIXEL <=31; CURRENT_PIXEL++)
+			{
+				SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
+				SETCOLOR( (*FOTON_LED_BOARD).CURRENT_DISP_IMAGE, PIX0,  PIX1,  SHIFT);
+
+				//PULSECLK();
+				SETCLK();
+				// TODO < Fix delay issue here somehow
+				//vTaskDelay(CLK_PULSE);
+				CLRCLK();
+			}
+
+				SETBLANK();
+						// Change Address in board to correct Address
+				SETADDR((*FOTON_LED_BOARD).addr[CURRENT_ROW]);
+						//UtilsDelay(500);
+						// Set Latch Signal
+				SETLATCH();
+						// Clr Latch Signal
+				CLRLATCH();
+						// Clr Blank Signal
+				CLRBLANK();
+				//vTaskDelay(ALPHA_DELAY); // fetch next delay
+				vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
+		}
+	}
 }
 
 //*****************************************************************************
@@ -357,7 +394,7 @@ void main()
     button2.enableInterrupt();
 
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
-    xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 8, &DISP_IMG_HNDLE);
+   // xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
 
 
     vTaskStartScheduler();

@@ -63,11 +63,11 @@ const char * COMMAND_STR_TABLE[] = {"","","","","","","","","","",
 void BlueToothInterruptHandler()
 {
 	unsigned long ulstatus =  UARTIntStatus(BLUETOOTH,true);
-
+	FOTON_BLUETOOTH->BackIndex+= 2; // THE DMA ALREADY TRANSFERED 4 bytes
     // Only Fires For UART_INT_DMARX
 	if(UARTCharsAvail(BLUETOOTH))
 	{
-		FOTON_BLUETOOTH->BackIndex+= 2; // THE DMA ALREADY TRANSFERED 4 bytes
+
 		if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX ) // Ring buffer, check end
 			FOTON_BLUETOOTH->BackIndex = (FOTON_BLUETOOTH->BackIndex - MAX_COMMAND_INDEX); // adjust index
 
@@ -78,16 +78,17 @@ void BlueToothInterruptHandler()
 			if(FOTON_BLUETOOTH->BackIndex >= MAX_COMMAND_INDEX )
 					FOTON_BLUETOOTH->BackIndex = 0;
 		}
-		BaseType_t xYieldRequired;
-		xYieldRequired = xTaskResumeFromISR(BLUETOOTH_READ_HNDLE);
-		portYIELD_FROM_ISR(xYieldRequired);
-
-		// Reconfigure DMA for next transfer
-		SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
-				       UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
-			           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
 	}
-	UARTIntClear(BLUETOOTH,UART_INT_DMARX | UART_INT_EOT); // Clear the interrupt
+
+	BaseType_t xYieldRequired;
+	xYieldRequired = xTaskResumeFromISR(BLUETOOTH_READ_HNDLE);
+	portYIELD_FROM_ISR(xYieldRequired);
+	// Reconfigure DMA for next transfer
+	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
+			       UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
+		           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
+
+	UARTIntClear(BLUETOOTH,UART_INT_DMARX ); // Clear the interrupt
 }
 
 
@@ -100,8 +101,7 @@ void BluetoothReadTask(void * nothing)
 {
 	while(1)
 	{
-		int index(0);
-		while(abs(FOTON_BLUETOOTH->FrontIndex - FOTON_BLUETOOTH->BackIndex) > 4)
+		while(abs(FOTON_BLUETOOTH->FrontIndex - FOTON_BLUETOOTH->BackIndex) >= 4)
 		{
 				CURRENT_MESSAGE->FUNC_CTRL = RXDATABUFF[FOTON_BLUETOOTH->FrontIndex++];
 				if(FOTON_BLUETOOTH->FrontIndex >= MAX_COMMAND_INDEX  )
@@ -249,7 +249,7 @@ void HC_05Bluetooth::enableDMA()
 {
 	uDMAChannelAssign(RX_DMA_CHANNEL);
 	uDMAChannelAssign(TX_DMA_CHANNEL);
-    UARTIntEnable(BLUETOOTH,  UART_INT_DMARX | UART_INT_EOT);
+    UARTIntEnable(BLUETOOTH,  UART_INT_DMARX);
 
     UARTDMAEnable(BLUETOOTH, UART_DMA_RX );
     IntRegister(BLUETOOTH_INT, BlueToothInterruptHandler);
@@ -272,7 +272,7 @@ void HC_05Bluetooth::setLiveMode()
 {
 	// Set To 4 byte mode
 	// 32 bit packets
-	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX4_8, UART_FIFO_RX1_8);
+	UARTFIFOLevelSet(BLUETOOTH, UART_FIFO_TX4_8, UART_FIFO_RX2_8);
 
 	// setup DMA Control Table for 4 byte transfer from FIFO
 	//   32 bits (4x8bits)  (DEST_SIZE)
@@ -285,7 +285,7 @@ void HC_05Bluetooth::setLiveMode()
 	FrontIndex = 0;
 	BackIndex = 0;
 	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
-		           UDMA_ARB_1,(void *)(BLUETOOTH+UART_O_DR),
+		           UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
 		           UDMA_SRC_INC_NONE,RXDATABUFF,UDMA_DST_INC_8);
 
 	// Send The Data
@@ -390,7 +390,7 @@ void HC_05Bluetooth::enterTransferMode()
 		vTaskDelete(BLUETOOTH_CMD_READ_HNDLE);
 		BLUETOOTH_CMD_READ_HNDLE = 0;
 	}
-	xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 2, &BLUETOOTH_READ_HNDLE);
+	xTaskCreate( BluetoothReadTask, "BLE",OSI_STACK_SIZE, NULL, 7, &BLUETOOTH_READ_HNDLE);
 	enable();
 	mTransferModeEnabled = true;
 
