@@ -125,7 +125,7 @@ void BluetoothReadTask(void * nothing)
 					}
 					case LED_SET_AT:
 					{
-						ledSet(CURRENT_MESSAGE->DATA1,CURRENT_MESSAGE->DATA2, FOTON_LED_BOARD);
+						ledSet(CURRENT_MESSAGE->DATA2,CURRENT_MESSAGE->DATA1, FOTON_LED_BOARD);
 						break;
 					}
 					case LED_CLEAR:

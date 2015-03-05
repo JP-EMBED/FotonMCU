@@ -31,7 +31,7 @@
 #include "pin.h"
 #include "ButtonDriver.h"
 #include "led.h"
-
+#include <timer.h>
 // LED Driver includes
 #include "LEDBoardGPIO.h"
 #include "DisplayDriver.h"
@@ -58,35 +58,10 @@ extern void (* const g_pfnVectors[])(void);
 //*****************************************************************************
 
 
-//*****************************************************************************
-//                      LOCAL DEFINITION
-//*****************************************************************************
 
 
-//*****************************************************************************
-//
-//! Board Initialization & Configuration
-//!
-//! \param  None
-//!
-//! \return None
-//
-//*****************************************************************************
-static void
-BoardInit(void)
-{
-/* In case of TI-RTOS vector table is initialize by OS itself */
-
-  MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
-
-  //
-  // Enable Processor
-  //
-  MAP_IntMasterEnable();
-  MAP_IntEnable(FAULT_SYSTICK);
-
-  PRCMCC3200MCUInit();
-}
+#define TIMER_INTERVAL_RELOAD   4000000000 /* =(255*157) */
+#define DUTYCYCLE_GRANULARITY   200000000 // 10% duty cycle (in 1ms period)
 
 
 TaskHandle_t       DEBOUNCE_TSK_HNDLE;
@@ -198,6 +173,116 @@ extern "C" void vApplicationStackOverflowHook( OsiTaskHandle *pxTask,
 }
 
 
+/****************************************************************************/
+/*                      LOCAL FUNCTION DEFINITIONS                          */
+/****************************************************************************/
+
+//****************************************************************************
+//
+//! Update the dutycycle of the PWM timer
+//!
+//! \param ulBase is the base address of the timer to be configured
+//! \param ulTimer is the timer to be setup (TIMER_A or  TIMER_B)
+//! \param ucLevel translates to duty cycle settings (0:255)
+//!
+//! This function
+//!    1. The specified timer is setup to operate as PWM
+//!
+//! \return None.
+//
+//****************************************************************************
+void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer,
+                     unsigned char ucLevel)
+{
+    //
+    // Match value is updated to reflect the new dutycycle settings
+    //
+    MAP_TimerMatchSet(ulBase,ulTimer,(ucLevel*DUTYCYCLE_GRANULARITY));
+}
+
+//****************************************************************************
+//
+//! Setup the timer in PWM mode
+//!
+//! \param ulBase is the base address of the timer to be configured
+//! \param ulTimer is the timer to be setup (TIMER_A or  TIMER_B)
+//! \param ulConfig is the timer configuration setting
+//! \param ucInvert is to select the inversion of the output
+//!
+//! This function
+//!    1. The specified timer is setup to operate as PWM
+//!
+//! \return None.
+//
+//****************************************************************************
+void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
+                       unsigned long ulConfig, unsigned char ucInvert)
+{
+    //
+    // Set GPT - Configured Timer in PWM mode.
+    //
+    MAP_TimerConfigure(ulBase,ulConfig);
+    MAP_TimerPrescaleSet(ulBase,ulTimer,0);
+
+    //
+    // Inverting the timer output if required
+    //
+    MAP_TimerControlLevel(ulBase,ulTimer,ucInvert);
+
+    //
+    // Load value set to ~0.5 ms time period
+    //
+    MAP_TimerLoadSet(ulBase,ulTimer,TIMER_INTERVAL_RELOAD);
+
+    //
+    // Match value set so as to output level 0
+    //
+    MAP_TimerMatchSet(ulBase,ulTimer,TIMER_INTERVAL_RELOAD);
+
+}
+
+
+
+void initializePWMClock()
+{
+
+	 PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
+	 PinTypeTimer(PIN_64, PIN_MODE_3);
+	 SetupTimerPWMMode(TIMERA2_BASE, TIMER_B,
+	            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PWM), 1);
+	 MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
+}
+
+
+//*****************************************************************************
+//                      LOCAL DEFINITION
+//*****************************************************************************
+
+
+//*****************************************************************************
+//
+//! Board Initialization & Configuration
+//!
+//! \param  None
+//!
+//! \return None
+//
+//*****************************************************************************
+static void
+BoardInit(void)
+{
+/* In case of TI-RTOS vector table is initialize by OS itself */
+
+  MAP_IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+
+  //
+  // Enable Processor
+  //
+  MAP_IntMasterEnable();
+  MAP_IntEnable(FAULT_SYSTICK);
+
+  PRCMCC3200MCUInit();
+}
 
 // TOGGLES Bluetooth state from transfer to configure
 static void button_func(const ButtonSTATUS & button_data, const bool &button_state)
@@ -213,6 +298,7 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
 {
     bluetooth.sendMessage("Hello World?\r\n",14);
 }
+
 
 void main()
 {
@@ -230,9 +316,7 @@ void main()
 	 // FillColor(255,255,102,0,1024, &leddisplay);
 	// SetPurpleGradient( &leddisplay );
 	ConfigLEDPins();
-
-	// initial the clock the first time.
-	//PRCMPeripheralClkEnable(PRCM_UARTA0, PRCM_RUN_MODE_CLK);
+	//initializePWMClock();
 
 
     InitTerm();
@@ -275,8 +359,6 @@ void main()
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
     xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 8, &DISP_IMG_HNDLE);
 
-    // attempt to use bluetooth
-  //  bluetooth.sendMessage("AT+UART?\r\n",22);
 
     vTaskStartScheduler();
     return;
