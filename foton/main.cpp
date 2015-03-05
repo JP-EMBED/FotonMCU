@@ -347,10 +347,10 @@ void main()
 	// TODO Add configure calls back after BCM Driver works a bit.
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
-	FillVary(&leddisplay);
+	//FillVary(&leddisplay);
 	// InitStartImage(&leddisplay);
 	// red, green, blue, start, end, driver
-	 // FillColor(255,255,102,0,1024, &leddisplay);
+	 FillColor(0,0,0,0,1024, &leddisplay);
 	// SetPurpleGradient( &leddisplay );
 	ConfigLEDPins();
 	//initializePWMClock();
