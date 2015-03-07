@@ -21,28 +21,14 @@ extern "C"
 
 #include "DisplayDriver.h"
 
-extern void InitStartImage(DisplayDriver * driver);
-
 // FillXXX - start and end are used in a for loop for filling driver IMAGE_ONEBUFF
 //format : (a=start; a<end; a++)
-extern void FillRed ( int start, int end, DisplayDriver * driver );
-extern void FillBlue ( int start, int end, DisplayDriver * driver );
-extern void FillGreen ( int start, int end , DisplayDriver * driver);
-extern void FillWhite ( int start, int end, DisplayDriver * driver );
-extern void FillPurple ( int start, int end, DisplayDriver * driver );
-extern void FillTeal ( int start, int end, DisplayDriver * driver );
-extern void FillYellow ( int start, int end, DisplayDriver * driver );
 extern void FillColor (unsigned char red,unsigned char green, unsigned char blue, int start, int end, DisplayDriver * driver );
 extern void FillVary (DisplayDriver * driver);
-extern void SetPurpleGradient( DisplayDriver * driver );
 // For work with bluetooth
 extern void ledSetColor(unsigned char red,unsigned char green, unsigned char blue, DisplayDriver * driver);
 extern void ledSet(unsigned char row, unsigned char col, DisplayDriver * driver);
 extern void ledFill(int start, int end, DisplayDriver * driver);
-
-#define Increment( num, num2 ) \
-	num = num + 8; \
-	num2 = num2 + 8
 
 //*****************************************************************************
 //

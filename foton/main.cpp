@@ -30,6 +30,7 @@
 #include "HC-05driver.h"
 #include "pin.h"
 #include "ButtonDriver.h"
+#include "ButtonFunctions.h"
 #include "led.h"
 #include <timer.h>
 // LED Driver includes
@@ -347,11 +348,8 @@ void main()
 	// TODO Add configure calls back after BCM Driver works a bit.
 	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
-	//FillVary(&leddisplay);
-	// InitStartImage(&leddisplay);
 	// red, green, blue, start, end, driver
 	 FillColor(0,0,0,0,1024, &leddisplay);
-	// SetPurpleGradient( &leddisplay );
 	ConfigLEDPins();
 	//initializePWMClock();
 
