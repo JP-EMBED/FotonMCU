@@ -20,7 +20,7 @@
 #define MAX_PIN_NUMBER  64
 #define OSI_STACK_SIZE          512
 
-#define USING_SERIAL_FOR_BLUETOOTH
+//#define USING_SERIAL_FOR_BLUETOOTH
 
 static unsigned char PinToPadMap[64] =
 {

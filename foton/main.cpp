@@ -77,7 +77,7 @@ static ButtonDriver button2(22);
  * Bluetooth (HC-05)
  * Board Pin	Function	GPIO Pin Alias	Pin Mode Config	Peripheral Pin	Foton Alias
  * PIN_18	 When pulled high, powers bluetooth module		    GPIO_28	0	LED	BLUETOOTH_READ_ENABLE
- * PIN_05	 Changes HC-05 between configure and transmit mode.	GPIO_03	0	KEY	BLUETOOTH_STATE_ENABLE
+ * PIN_59	 Changes HC-05 between configure and transmit mode.	GPIO_04	0	KEY	BLUETOOTH_STATE_ENABLE
  * PIN_55	 Data line for Bluetooth Tx							GPIO_01	5	RXD	BLUETOOTH_TX
  * PIN_57	 Data line for Bluetooth Rx							GPIO_02	5	TXD	BLUETOOTH_RX
  *
@@ -85,7 +85,7 @@ static ButtonDriver button2(22);
 #ifdef USING_SERIAL_FOR_BLUETOOTH
 static HC_05Bluetooth  bluetooth(PIN_57,PIN_MODE_3,PIN_55,PIN_MODE_3,28,PIN_MODE_0,14,PIN_MODE_0);
 #else
-static HC_05Bluetooth  bluetooth(PIN_02,PIN_MODE_7,PIN_01,PIN_MODE_7,28,PIN_MODE_0,21,PIN_MODE_0);
+static HC_05Bluetooth  bluetooth(PIN_45,PIN_MODE_6,PIN_07,PIN_MODE_5,28,PIN_MODE_0,4,PIN_MODE_0);
 #endif
 char RXDATABUFF[MAX_COMMAND_INDEX];
 HC_05Bluetooth * FOTON_BLUETOOTH;
@@ -394,7 +394,6 @@ void main()
     button2.enableInterrupt();
 
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
-   // xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
 
 
     vTaskStartScheduler();

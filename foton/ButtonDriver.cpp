@@ -40,7 +40,7 @@ static void BUTTON_SECOND_COUNTER_TASK(void * debounce)
 		{
 			TaskHandle_t xHandle = NULL;
 			xTaskCreate(PerformFunctionTaskButton, "", 256, reinterpret_cast<void *>(debounce_ctrl->BUTTON) , 3 , &xHandle);
-			vTaskDelay(1 * portTICK_PERIOD_MS);
+			vTaskDelay(1 / portTICK_PERIOD_MS);
 			if(debounce_ctrl->FIRE_MODE == BUTTON_ON_PULSE_AT_X)
 				debounce_ctrl->BUTTON->mStatus.HELD_COUNT = 0;
 		}
