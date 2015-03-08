@@ -142,7 +142,7 @@ public:
 			   unsigned char POWER_pin,unsigned long GPIO_power,
 			   unsigned char STATE_pin,unsigned long GPIO_state);
 
-
+	bool getPower(){return mPoweredON;}
 	void configureDMATransfers(bool livemode);
 	void enableDMA();
 	void enable(void);

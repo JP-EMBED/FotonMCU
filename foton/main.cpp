@@ -385,7 +385,7 @@ void main()
     // Configure Button two
     Button2_PTR = &button2;
     button2.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
-    button2.registerButtonFunc(button_func2);
+    button2.registerButtonFunc(StandbyMode);
     debounce.FIRE_MODE = BUTTON_ON_RELEASED;
     debounce.CTRL_DATA = 1;
     ButtonDriver::configureDebounce(2, debounce);
