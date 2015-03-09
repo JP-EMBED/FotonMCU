@@ -45,7 +45,7 @@ extern "C"
 // Top Rows
 #define R0_PIN 0x40
 #define G0_PIN 0x10
-#define B0_PIN 0x20
+#define B0_PIN 0x01
 
 // Bottom Rows
 #define R1_PIN 0x20
@@ -56,7 +56,7 @@ extern "C"
 #define D_PIN 0x10
 #define A_PIN 0x80
 #define B_PIN 0x40
-#define C_PIN 0x40
+#define C_PIN 0x04
 
 
 // Ports for each signal
@@ -69,7 +69,7 @@ extern "C"
 // Top Rows
 #define R0_PORT GPIOA1_BASE
 #define G0_PORT GPIOA1_BASE
-#define B0_PORT GPIOA1_BASE
+#define B0_PORT GPIOA4_BASE
 
 // Bottom Rows
 #define R1_PORT GPIOA0_BASE
@@ -80,7 +80,7 @@ extern "C"
 #define A_PORT GPIOA0_BASE
 #define D_PORT GPIOA0_BASE
 #define B_PORT GPIOA3_BASE
-#define C_PORT GPIOA2_BASE
+#define C_PORT GPIOA0_BASE
 
 // masks to find value for pin in address
 #define A_MASK 0x8

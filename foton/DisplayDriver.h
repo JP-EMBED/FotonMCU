@@ -42,10 +42,6 @@
 *		UPDATEDUTYCYCLE(lvl)
 *			Updates the duty cycle of the PWM
 *
-*		INCREMTENTSHIFT(SHIFT, ADDR)
-*			Increment pixel shift for current row accordingl
-*		INCREMENTADDR( ADDR )
-*			Increment address accordingly
 *
 *************************************************************************/
 #ifndef DISPLAYDRIVER_H_
@@ -156,7 +152,7 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
  *
  **********************************************************************/
 #define SETBLUE( color,  P0_NUM,  P1_NUM,  SHIFT) \
- HWREG(B0_PORT + (GPIO_O_GPIO_DATA + (B0_PIN << 2))) = ((color[P0_NUM].blue >> SHIFT )& 1)<<5; \
+ HWREG(B0_PORT + (GPIO_O_GPIO_DATA + (B0_PIN << 2))) = ((color[P0_NUM].blue >> SHIFT )& 1); \
  HWREG(B1_PORT + (GPIO_O_GPIO_DATA + (B1_PIN << 2))) = ((color[P1_NUM].blue >> SHIFT )& 1)<<7
 
  /**********************************************************************
@@ -182,7 +178,7 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
 #define SETADDR( CURRENT_ROW ) \
  HWREG(A_PORT + (GPIO_O_GPIO_DATA + (A_PIN << 2))) = (CURRENT_ROW & A_MASK)<<4; \
  HWREG(B_PORT + (GPIO_O_GPIO_DATA + (B_PIN << 2))) = (CURRENT_ROW & B_MASK)<<4; \
- HWREG(C_PORT + (GPIO_O_GPIO_DATA + (C_PIN << 2))) = (CURRENT_ROW & C_MASK)<<5; \
+ HWREG(C_PORT + (GPIO_O_GPIO_DATA + (C_PIN << 2))) = (CURRENT_ROW & C_MASK)<<1; \
  HWREG(D_PORT + (GPIO_O_GPIO_DATA + (D_PIN << 2))) = (CURRENT_ROW & D_MASK)<<4
 
  /**********************************************************************
