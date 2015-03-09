@@ -9,6 +9,7 @@
 #include "HC-05driver.h"
 #include "GenerateImage.h"
 
+//Pretend to be off
 void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state)
 {
 	if ( FOTON_BLUETOOTH->getPower() ) // Turn on Standby
@@ -28,6 +29,7 @@ void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state)
 	}
 }
 
+// Disable Bluetooth
 void BluetoothDisabled(const ButtonSTATUS & button_data, const bool &button_state)
 {
 	if ( FOTON_BLUETOOTH->getPower() ) // Turn on Standby

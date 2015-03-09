@@ -345,8 +345,6 @@ void main()
     //
     BoardInit();
 	UDMAInit();
-	// TODO Add configure calls back after BCM Driver works a bit.
-	// TODO Configure Display Driver and pins < make displaydriver static and global
 	ConfigureDisplayDriver(&leddisplay);
 	// red, green, blue, start, end, driver
 	 FillColor(0,0,0,0,1024, &leddisplay);
