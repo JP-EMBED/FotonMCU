@@ -100,19 +100,20 @@ void DisplayCurrentImageBCM(void * d)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
-			for (SHIFT=0;SHIFT<8;SHIFT++)
+			for (SHIFT=1;SHIFT<8;SHIFT++)
 			{
 				for (CURRENT_PIXEL=0; CURRENT_PIXEL <=31; CURRENT_PIXEL++)
 				{
+					CLRCLK();
 					SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
 					SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
 					SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  SHIFT);
-
-					//PULSECLK();
 					SETCLK();
+					//PULSECLK();
+
 					// TODO < Fix delay issue here somehow
 					//vTaskDelay(CLK_PULSE);
-					CLRCLK();
+
 				}
 
 					SETBLANK();
@@ -122,13 +123,15 @@ void DisplayCurrentImageBCM(void * d)
 							// Set Latch Signal
 					SETLATCH();
 							// Clr Latch Signal
+
+
 					CLRLATCH();
 							// Clr Blank Signal
-					CLRBLANK();
 					//vTaskDelay(ALPHA_DELAY); // fetch next delay
 					vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
+					CLRBLANK();
 			}
-			vTaskDelay( ALPHA_DELAY );
+			//vTaskDelay( ALPHA_DELAY );
 		}
 	}
 }

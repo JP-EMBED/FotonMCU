@@ -136,7 +136,7 @@ extern "C" void vAssertCalled( const char *pcFile, unsigned long ulLine )
 extern "C" void vApplicationIdleHook( void)
 {
 
-	int CURRENT_PIXEL=0;
+/*	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
 	int SHIFT=0;
 	int PIX0=0;
@@ -172,7 +172,7 @@ extern "C" void vApplicationIdleHook( void)
 				//vTaskDelay(ALPHA_DELAY); // fetch next delay
 				vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
 		}
-	}
+	}*/
 }
 
 //*****************************************************************************
@@ -388,7 +388,7 @@ void main()
     debounce.CTRL_DATA = 1;
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
-
+    xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
 
