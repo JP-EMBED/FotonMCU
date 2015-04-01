@@ -337,6 +337,20 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
     bluetooth.sendMessage("Hello World?\r\n",14);
 }
 
+unsigned char BLANK_PIN_NUM;
+unsigned char BLANK_PIN_ADDR;
+unsigned long BLANK_PORT_ADDR;
+
+
+void initializeLEDBoardPins()
+{
+	getPinNumber(31,&BLANK_PIN_NUM,&BLANK_PORT_ADDR,&BLANK_PIN_ADDR);
+	unsigned long prcm_port(getGPIOPRCMPort(BLANK_PORT_ADDR));
+    PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
+	PinTypeGPIO(BLANK_PIN_NUM, PIN_MODE_0, false);
+	GPIODirModeSet(BLANK_PORT_ADDR,BLANK_PIN_ADDR,GPIO_DIR_MODE_OUT);
+
+}
 
 void main()
 {
@@ -347,9 +361,10 @@ void main()
 	UDMAInit();
 	ConfigureDisplayDriver(&leddisplay);
 	// red, green, blue, start, end, driver
-	 FillColor(0,0,0,0,1024, &leddisplay);
+	 FillColor(255,0,0,0,1024, &leddisplay);
 	ConfigLEDPins();
 	//initializePWMClock();
+	initializeLEDBoardPins();
 
 
     InitTerm();

@@ -6,10 +6,6 @@
 *
 * Macro Functions:
 *	- Macros used in sending data out to the LED board
-*		SETP0(int P0_NUM, int CURRENT_ROW, int CURRENT_PIXEL)
-*			sets the current pixel for the row in top section of the led display
-*		SETP1(int P1_NUM, int CURRENT_ROW, int CURRENT_PIXEL)
-*			sets the current pixel for the row in bottom section of the led display
 *
 *		SETRED(FOTON_RGB color[ ], int P0_NUM, int P1_NUM, int SHIFT)
 *			sets R0 and R1 for the current bit and pixel data
@@ -104,24 +100,6 @@ extern void ConfigLEDPins(void);
 extern void DisplayCurrentImageRGB(void * d);
 extern void DisplayCurrentImageBCM(void * d);
 extern void ConfigureDisplayDriver( DisplayDriver * driver );
-
-/**********************************************************************
- *
- * sets the current pixel for the row in top section of the led display
- * P0_NUM will be used to grab the color from the FOTON_RGB array
- *
- **********************************************************************/
-#define SETP0( P0_NUM,  CURRENT_ROW,  CURRENT_PIXEL) \
- P0_NUM = CURRENT_ROW*32 + CURRENT_PIXEL
-
-/**********************************************************************
- *
- * sets the current pixel for the row in bottom section of the led display
- * P1_NUM will be used to grab the color from the FOTON_RGB array
- *
- **********************************************************************/
-#define SETP1( P1_NUM,  CURRENT_ROW,  CURRENT_PIXEL) \
- P1_NUM = (CURRENT_ROW+16)*32 + CURRENT_PIXEL
 
 /**********************************************************************
  *
@@ -237,6 +215,21 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
  #define PULSECLK() \
  HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = CLK_PIN; \
  HWREG(CLK_PORT + (GPIO_O_GPIO_DATA + (CLK_PIN << 2))) = 0
+
+/**********************************************************************
+*
+* Clear color
+*
+**********************************************************************/
+#define CLRCOLOR()\
+		HWREG(R0_PORT + (GPIO_O_GPIO_DATA + (R0_PIN << 2))) = 0; \
+		HWREG(R1_PORT + (GPIO_O_GPIO_DATA + (R1_PIN << 2))) = 0; \
+		HWREG(G0_PORT + (GPIO_O_GPIO_DATA + (G0_PIN << 2))) = 0; \
+		HWREG(G1_PORT + (GPIO_O_GPIO_DATA + (G1_PIN << 2))) = 0; \
+		HWREG(B0_PORT + (GPIO_O_GPIO_DATA + (B0_PIN << 2))) = 0; \
+		HWREG(B1_PORT + (GPIO_O_GPIO_DATA + (B1_PIN << 2))) = 0
+
+
 
 //*****************************************************************************
 //
