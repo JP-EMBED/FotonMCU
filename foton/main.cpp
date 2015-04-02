@@ -363,7 +363,7 @@ void main()
 	UDMAInit();
 	ConfigureDisplayDriver(&leddisplay);
 	// red, green, blue, start, end, driver
-	 FillColor(55,0,100,0,1024, &leddisplay);
+	 FillColor(255,255,255,0,1024, &leddisplay);
 	ConfigLEDPins();
 	//initializePWMClock();
     initializeLEDBoardPins();

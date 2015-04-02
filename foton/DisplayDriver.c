@@ -129,10 +129,6 @@ void DisplayCurrentImageBCM2(void * d)
 	while(1)
 	{
 
-		SETBLANK();
-		SETLATCH();
-		SETADDR(CURRENT_ROW);
-
 		if(++SHIFT >= 8) // increment color phase
 		{
 			SHIFT = 0; // finished color phase
@@ -142,11 +138,11 @@ void DisplayCurrentImageBCM2(void * d)
 			}
 		}
 
-
-
-
-		CLRLATCH();
-
+		SETBLANK();
+		vTaskDelay(0.0001);
+		SETLATCH();
+		SETADDR(CURRENT_ROW);
+		vTaskDelay(0.0000001);
 		UPDATEPIXEL(0);
 		UPDATEPIXEL(1);
 		UPDATEPIXEL(2);
@@ -179,8 +175,11 @@ void DisplayCurrentImageBCM2(void * d)
 		UPDATEPIXEL(29);
 		UPDATEPIXEL(30);
 		UPDATEPIXEL(31);
+		CLRLATCH();
+
 		CLRBLANK();
-		vTaskDelay( 0.000001 * (float)(1 << SHIFT)  - ALPHA_DELAY);
+		vTaskDelay( 0.000000001 * (float)(1 << SHIFT)  - ALPHA_DELAY);
+
 	}
 }
 

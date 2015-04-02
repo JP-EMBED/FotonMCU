@@ -94,7 +94,7 @@ extern unsigned long BLANK_PORT_ADDR;
 
 // Clock Values
 #define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
-#define ALPHA_DELAY 25/10000000
+#define ALPHA_DELAY 25/1000000000
 
 #define SHIFT_DELAY 1/100000
 
