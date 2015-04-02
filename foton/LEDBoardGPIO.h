@@ -38,8 +38,12 @@ extern "C"
 // bit packed pin representation for each signal
 // Control Signals
 #define LATCH_PIN 0x01
-#define BLANK_PIN 0x02
+#define BLANK_PIN 0x80
 #define CLK_PIN 0x02
+
+extern unsigned char BLANK_PIN_NUM;
+extern unsigned char BLANK_PIN_ADDR;
+extern unsigned long BLANK_PORT_ADDR;
 
 // Color Coding Signals
 // Top Rows
@@ -90,8 +94,12 @@ extern "C"
 
 // Clock Values
 #define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
-#define ALPHA_DELAY 1/(portTICK_PERIOD_MS) //1 millisecond, time between row output
+#define ALPHA_DELAY 25/10000000
+
 #define SHIFT_DELAY 1/100000
+
+#define COLOR_DELAY(SHIFT)\
+	vTaskDelay( 0.001 * (float)(1 << SHIFT) )
 
 //*****************************************************************************
 //

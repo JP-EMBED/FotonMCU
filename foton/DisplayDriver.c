@@ -17,12 +17,12 @@
 *			Sets up the pins for driving the led display board
 *
 *************************************************************************/
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "portmacro.h"
-#include "osi.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
+#include <portmacro.h>
+#include <osi.h>
 
 #include <hw_types.h>
 #include <hw_memmap.h>
@@ -49,90 +49,138 @@ void DisplayCurrentImageRGB(void * d)
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
-	int PIX0=0;
-	int PIX1=0;
 	TickType_t xLastWakeTime;
-	const TickType_t xFrequency = ALPHA_DELAY;
+	const TickType_t xFrequency = 0.0001;
 	xLastWakeTime = xTaskGetTickCount();
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
+			SETBLANK();
+
+			//CLRCOLOR();
+			SETCOLOR((*driver).CURRENT_DISP_IMAGE, CURRENT_ROW*32 + CURRENT_PIXEL,  (CURRENT_ROW+16)*32 + CURRENT_PIXEL, 0);
+
+			SETADDR((*driver).addr[CURRENT_ROW]);
+
 			for (CURRENT_PIXEL=0; CURRENT_PIXEL<32; CURRENT_PIXEL++)
 			{
-				SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
-				SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  0);
+				SETCOLOR((*driver).CURRENT_DISP_IMAGE, CURRENT_ROW*32 + CURRENT_PIXEL,  (CURRENT_ROW+16)*32 + CURRENT_PIXEL, 0);
 
-				//PULSECLK();
+				//PULSECLK
 				SETCLK();
-				// TODO < Fix delay issue here somehow
-				//vTaskDelay(CLK_PULSE);
 				CLRCLK();
 			}
 
-				SETBLANK();
-						// Change Address in board to correct Address
-				SETADDR((*driver).addr[CURRENT_ROW]);
-						//UtilsDelay(500);
-						// Set Latch Signal
-				SETLATCH();
-						// Clr Latch Signal
-				CLRLATCH();
-						// Clr Blank Signal
-				CLRBLANK();
-				//vTaskDelay(ALPHA_DELAY); // fetch next delay
-				vTaskDelayUntil( &xLastWakeTime, xFrequency );
+			SETLATCH();
+			CLRLATCH();
+			CLRBLANK();
+			vTaskDelayUntil( &xLastWakeTime, xFrequency );
 		}
 	}
 }
 
-// TODO this actually doing a thing
+
+
 void DisplayCurrentImageBCM(void * d)
 {
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_PIXEL=0;
 	int CURRENT_ROW=0;
 	int SHIFT=0;
-	int PIX0=0;
-	int PIX1=0;
 	while(1)
 	{
 		for (CURRENT_ROW=0; CURRENT_ROW<16;CURRENT_ROW++)
 		{
+
 			for (SHIFT=1;SHIFT<8;SHIFT++)
 			{
+				SETBLANK();
+
+				CLRCOLOR();
+				SETADDR((*driver).addr[CURRENT_ROW]);
 				for (CURRENT_PIXEL=0; CURRENT_PIXEL <=31; CURRENT_PIXEL++)
 				{
-					CLRCLK();
-					SETP0( PIX0,  CURRENT_ROW,  CURRENT_PIXEL);
-					SETP1( PIX1,  CURRENT_ROW,  CURRENT_PIXEL);
-					SETCOLOR( (*driver).CURRENT_DISP_IMAGE, PIX0,  PIX1,  SHIFT);
-					SETCLK();
-					//PULSECLK();
+					SETCOLOR((*driver).CURRENT_DISP_IMAGE, CURRENT_ROW*32 + CURRENT_PIXEL,  (CURRENT_ROW+16)*32 + CURRENT_PIXEL, SHIFT);
 
-					// TODO < Fix delay issue here somehow
-					//vTaskDelay(CLK_PULSE);
+					//PULSECLK;
+					SETCLK();
+					CLRCLK();
 
 				}
 
-					SETBLANK();
-							// Change Address in board to correct Address
-					SETADDR((*driver).addr[CURRENT_ROW]);
-							//UtilsDelay(500);
-							// Set Latch Signal
-					SETLATCH();
-							// Clr Latch Signal
+				SETLATCH();
+				CLRLATCH();
 
 
-					CLRLATCH();
-							// Clr Blank Signal
-					//vTaskDelay(ALPHA_DELAY); // fetch next delay
-					vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
-					CLRBLANK();
+				CLRBLANK();
+				vTaskDelay( SHIFT_DELAY * (1 << SHIFT) );
 			}
-			//vTaskDelay( ALPHA_DELAY );
+
 		}
+	}
+}
+
+void DisplayCurrentImageBCM2(void * d)
+{
+	DisplayDriver * driver = (DisplayDriver *)d;
+	int CURRENT_ROW=0;
+	int SHIFT=0;
+	while(1)
+	{
+
+		SETBLANK();
+		SETLATCH();
+		SETADDR(CURRENT_ROW);
+
+		if(++SHIFT >= 8) // increment color phase
+		{
+			SHIFT = 0; // finished color phase
+			if(++CURRENT_ROW >= 16) //increment row
+			{
+				CURRENT_ROW = 0;
+			}
+		}
+
+
+
+
+		CLRLATCH();
+
+		UPDATEPIXEL(0);
+		UPDATEPIXEL(1);
+		UPDATEPIXEL(2);
+		UPDATEPIXEL(3);
+		UPDATEPIXEL(4);
+		UPDATEPIXEL(5);
+		UPDATEPIXEL(6);
+		UPDATEPIXEL(7);
+		UPDATEPIXEL(8);
+		UPDATEPIXEL(9);
+		UPDATEPIXEL(10);
+		UPDATEPIXEL(11);
+		UPDATEPIXEL(12);
+		UPDATEPIXEL(13);
+		UPDATEPIXEL(14);
+		UPDATEPIXEL(15);
+		UPDATEPIXEL(16);
+		UPDATEPIXEL(17);
+		UPDATEPIXEL(18);
+		UPDATEPIXEL(19);
+		UPDATEPIXEL(20);
+		UPDATEPIXEL(21);
+		UPDATEPIXEL(22);
+		UPDATEPIXEL(23);
+		UPDATEPIXEL(24);
+		UPDATEPIXEL(25);
+		UPDATEPIXEL(26);
+		UPDATEPIXEL(27);
+		UPDATEPIXEL(28);
+		UPDATEPIXEL(29);
+		UPDATEPIXEL(30);
+		UPDATEPIXEL(31);
+		CLRBLANK();
+		vTaskDelay( 0.000001 * (float)(1 << SHIFT)  - ALPHA_DELAY);
 	}
 }
 
@@ -220,8 +268,8 @@ void ConfigLEDPins(void)
 	    //
 	    // Configure PIN_21 for GPIO Output
 	    // BLANK
-	    PinTypeGPIO(PIN_21, PIN_MODE_0, false);
-	    GPIODirModeSet(GPIOA3_BASE, 0x2, GPIO_DIR_MODE_OUT);
+	   // PinTypeGPIO(PIN_45, PIN_MODE_0, false);
+	   // GPIODirModeSet(GPIOA3_BASE, 0x10, GPIO_DIR_MODE_OUT);
 
 
 	    //

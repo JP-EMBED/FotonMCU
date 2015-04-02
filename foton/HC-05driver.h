@@ -13,8 +13,8 @@
 
 #define MAX_NAME_LENGTH 90
 #define MAX_COMMAND_INDEX 300
-#include "hw_types.h"
-#include "udma.h"
+#include <hw_types.h>
+#include <udma.h>
 #include <FreeRTOS.h>
 #include <queue.h>
 #include "ButtonDriver.h"

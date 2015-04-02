@@ -1,22 +1,23 @@
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "hw_ints.h"
+#include <hw_types.h>
+#include <hw_memmap.h>
+#include <hw_ints.h>
 
 // TODO: REPLACE DEPENDANCY ON GPIO WITH CUSTOM GPIO DRIVER
-#include "gpio.h"
+#include <gpio.h>
 
-#include "interrupt.h"
+#include <interrupt.h>
 
-#include "uart_if.h"
 
-#include "pin.h"
+
+#include <pin.h>
 #include "ButtonDriver.h"
-#include "prcm.h"
+#include <prcm.h>
 #include "utility_functions.h"
 
-#include "systick.h"
-#include "FreeRTOS.h"
-#include "task.h"
+#include <systick.h>
+#include <FreeRTOS.h>
+#include <task.h>
+
 #define IS_MASKED  1
 #define DEBOUNCED  3
 

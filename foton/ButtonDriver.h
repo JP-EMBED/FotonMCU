@@ -9,19 +9,12 @@
 #define BUTTONDRIVER_H_
 
 
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "hw_gpio.h"
-#include "hw_uart.h"
-#include "uart.h"
-#include "gpio.h"
-#include "prcm.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "udma.h"
-#include "uart_if.h"
-#include "udma_if.h"
-#include "pin.h"
+#include <hw_types.h>
+#include <hw_memmap.h>
+#include <hw_gpio.h>
+#include <gpio.h>
+#include <prcm.h>
+#include <pin.h>
 
 #include "utility_functions.h"
 

@@ -1,37 +1,38 @@
 
 // Free-RTOS includes
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "portmacro.h"
-#include "osi.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
+#include <portmacro.h>
+#include <osi.h>
 
 
 // Driverlib includes
-#include "hw_memmap.h"
-#include "hw_common_reg.h"
-#include "hw_types.h"
-#include "hw_ints.h"
-#include "interrupt.h"
-#include "rom.h"
-#include "rom_map.h"
-#include "uart.h"
-#include "prcm.h"
-#include "utils.h"
-#include "hw_uart.h"
+#include <hw_memmap.h>
+#include <hw_common_reg.h>
+#include <hw_types.h>
+#include <hw_ints.h>
+#include <interrupt.h>
+#include <rom.h>
+#include <rom_map.h>
+#include <uart.h>
+#include <prcm.h>
+#include <utils.h>
+#include <hw_uart.h>
+
 
 // Common interface includes
 #include "uart_if.h"
-#include "udma_if.h"
+#include "udma_if.h""
 
 #include "pin_mux.h"
 
 #include "HC-05driver.h"
-#include "pin.h"
+#include <pin.h>
 #include "ButtonDriver.h"
 #include "ButtonFunctions.h"
-#include "led.h"
+//#include "led.h"
 #include <timer.h>
 // LED Driver includes
 #include "LEDBoardGPIO.h"
@@ -337,6 +338,21 @@ static void button_func2(const ButtonSTATUS & button_data, const bool &button_st
     bluetooth.sendMessage("Hello World?\r\n",14);
 }
 
+unsigned char BLANK_PIN_NUM;
+unsigned char BLANK_PIN_ADDR;
+unsigned long BLANK_PORT_ADDR;
+
+
+void initializeLEDBoardPins()
+{
+	getPinNumber(31,&BLANK_PIN_NUM,&BLANK_PORT_ADDR,&BLANK_PIN_ADDR);
+	unsigned long prcm_port(getGPIOPRCMPort(BLANK_PORT_ADDR));
+    PRCMPeripheralClkEnable(prcm_port, PRCM_RUN_MODE_CLK);
+	PinTypeGPIO(BLANK_PIN_NUM, PIN_MODE_0, false);
+	GPIODirModeSet(BLANK_PORT_ADDR,BLANK_PIN_ADDR,GPIO_DIR_MODE_OUT);
+
+}
+
 
 void main()
 {
@@ -347,10 +363,10 @@ void main()
 	UDMAInit();
 	ConfigureDisplayDriver(&leddisplay);
 	// red, green, blue, start, end, driver
-	 FillColor(0,0,0,0,1024, &leddisplay);
+	 FillColor(55,0,100,0,1024, &leddisplay);
 	ConfigLEDPins();
 	//initializePWMClock();
-
+    initializeLEDBoardPins();
 
     InitTerm();
 
@@ -388,7 +404,8 @@ void main()
     debounce.CTRL_DATA = 1;
     ButtonDriver::configureDebounce(2, debounce);
     button2.enableInterrupt();
-    xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
+   //xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImageBCM2, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
 

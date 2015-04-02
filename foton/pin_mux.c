@@ -43,12 +43,12 @@
 //*****************************************************************************
 
 #include "pin_mux.h"
-#include "hw_types.h"
-#include "hw_memmap.h"
-#include "hw_gpio.h"
-#include "pin.h"
-#include "gpio.h"
-#include "prcm.h"
+#include <hw_types.h>
+#include <hw_memmap.h>
+#include <hw_gpio.h>
+#include <pin.h>
+#include <gpio.h>
+#include <prcm.h>
 
 //*****************************************************************************
 void PinMuxConfig(void)
