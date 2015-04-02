@@ -38,12 +38,8 @@ extern "C"
 // bit packed pin representation for each signal
 // Control Signals
 #define LATCH_PIN 0x01
-#define BLANK_PIN 0x80
+#define BLANK_PIN 0x02
 #define CLK_PIN 0x02
-
-extern unsigned char BLANK_PIN_NUM;
-extern unsigned char BLANK_PIN_ADDR;
-extern unsigned long BLANK_PORT_ADDR;
 
 // Color Coding Signals
 // Top Rows

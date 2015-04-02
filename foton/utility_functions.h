@@ -64,7 +64,6 @@ static unsigned int GPIO2Pin(unsigned char gpio_pin_number)
 		case   4: return PIN_59;
 		case   8: return PIN_62;
 		case  14: return PIN_05;
-		case  31: return PIN_45;
 		default : return PIN_ERROR;
 	}
 }
