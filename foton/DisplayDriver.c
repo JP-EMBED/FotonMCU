@@ -125,60 +125,42 @@ void DisplayCurrentImageBCM2(void * d)
 {
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_ROW=0;
+	int CURRENT_PIXEL = 0;
 	int SHIFT=0;
+	int pixel_offset= 0;
+	SETADDR((*driver).addr[CURRENT_ROW]);
 	while(1)
 	{
 
 		if(++SHIFT >= 8) // increment color phase
 		{
 			SHIFT = 0; // finished color phase
-			if(++CURRENT_ROW >= 16) //increment row
+			if(++CURRENT_ROW >= 16)
 			{
 				CURRENT_ROW = 0;
 			}
-		}
 
+		}
 		SETBLANK();
-		vTaskDelay(0.0001);
+		SETADDR((*driver).addr[CURRENT_ROW]);
 		SETLATCH();
-		SETADDR(CURRENT_ROW);
-		vTaskDelay(0.0000001);
-		UPDATEPIXEL(0);
-		UPDATEPIXEL(1);
-		UPDATEPIXEL(2);
-		UPDATEPIXEL(3);
-		UPDATEPIXEL(4);
-		UPDATEPIXEL(5);
-		UPDATEPIXEL(6);
-		UPDATEPIXEL(7);
-		UPDATEPIXEL(8);
-		UPDATEPIXEL(9);
-		UPDATEPIXEL(10);
-		UPDATEPIXEL(11);
-		UPDATEPIXEL(12);
-		UPDATEPIXEL(13);
-		UPDATEPIXEL(14);
-		UPDATEPIXEL(15);
-		UPDATEPIXEL(16);
-		UPDATEPIXEL(17);
-		UPDATEPIXEL(18);
-		UPDATEPIXEL(19);
-		UPDATEPIXEL(20);
-		UPDATEPIXEL(21);
-		UPDATEPIXEL(22);
-		UPDATEPIXEL(23);
-		UPDATEPIXEL(24);
-		UPDATEPIXEL(25);
-		UPDATEPIXEL(26);
-		UPDATEPIXEL(27);
-		UPDATEPIXEL(28);
-		UPDATEPIXEL(29);
-		UPDATEPIXEL(30);
-		UPDATEPIXEL(31);
+		vTaskDelay(0.000000001);
+		pixel_offset = CURRENT_ROW * 32;
+		for(CURRENT_PIXEL = 0; CURRENT_PIXEL < 32; ++CURRENT_PIXEL)
+		{
+			//UPDATEPIXEL((32 * CURRENT_ROW + CURRENT_PIXEL), (512 + (32* CURRENT_ROW) + CURRENT_PIXEL));
+			SETCOLOR((*driver).CURRENT_DISP_IMAGE, (pixel_offset + CURRENT_PIXEL) , (512 + pixel_offset + CURRENT_PIXEL), SHIFT);
+			SETCLK();
+			CLRCLK();
+
+		}
 		CLRLATCH();
 
 		CLRBLANK();
-		vTaskDelay( 0.000000001 * (float)(1 << SHIFT)  - ALPHA_DELAY);
+		vTaskDelay( 0.000000000000001 * (float)(1 << SHIFT));
+
+
+
 
 	}
 }
@@ -192,7 +174,7 @@ void DisplayCurrentImageBCM2(void * d)
 void ConfigureDisplayDriver(DisplayDriver * driver)
 {
 	int i=0;
-	int addre[32] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
+	int addre[32] = {0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15,0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15};
 	for (i=0;i<32;i++)
 	{
 		(*driver).addr[i]=addre[i];
