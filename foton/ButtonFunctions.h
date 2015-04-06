@@ -12,5 +12,7 @@
 
 extern  void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state);
 extern  void BluetoothDisabled(const ButtonSTATUS & button_data, const bool &button_state);
+extern  void SwitchDisplayImageLeft(const ButtonSTATUS & button_data, const bool &button_state);
+extern  void SwitchDisplayImageRight(const ButtonSTATUS & button_data, const bool &button_state);
 
 #endif /* BUTTONFUNCTIONS_H_ */

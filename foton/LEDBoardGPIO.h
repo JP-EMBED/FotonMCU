@@ -94,12 +94,14 @@ extern unsigned long BLANK_PORT_ADDR;
 
 // Clock Values
 #define CLK_PULSE 110/(portTICK_PERIOD_MS*1000000) // 110 nano seconds TODO figure out actual num
-#define ALPHA_DELAY 25/1000000000
-
+#define ALPHA_DELAY_RATIO .001
+extern float ALPHA_DELAY_VALUE;
 #define SHIFT_DELAY 1/100000
 
 #define COLOR_DELAY(SHIFT)\
 	vTaskDelay( 0.001 * (float)(1 << SHIFT) )
+
+
 
 //*****************************************************************************
 //

@@ -54,17 +54,19 @@ static unsigned int GPIO2Pin(unsigned char gpio_pin_number)
 {
 	switch(gpio_pin_number)
 	{
+		case   2: return PIN_57;
+		case   3: return PIN_58;
+		case   4: return PIN_59;
+		case   8: return PIN_63;
 	    case   9: return PIN_64;
 		case  10: return PIN_01;
 		case  11: return PIN_02;
 		case  13: return PIN_04;
 		case  22: return PIN_15;
 		case  28: return PIN_18;
-		case   3: return PIN_58;
-		case   4: return PIN_59;
-		case   8: return PIN_62;
 		case  14: return PIN_05;
 		case  31: return PIN_45;
+		case  32: return PIN_52;
 		default : return PIN_ERROR;
 	}
 }

@@ -99,7 +99,7 @@ extern void DisplayCurrentImageRGB(void * d);
 extern void DisplayCurrentImageBCM(void * d);
 extern void DisplayCurrentImageBCM2(void * d);
 extern void ConfigureDisplayDriver( DisplayDriver * driver );
-
+extern void SETALPHA(unsigned int alpha);
 /**********************************************************************
  *
  * sets R0 and R1 for the current bit and pixel data
@@ -229,8 +229,8 @@ extern void ConfigureDisplayDriver( DisplayDriver * driver );
 		HWREG(B1_PORT + (GPIO_O_GPIO_DATA + (B1_PIN << 2))) = 0
 
 
-#define UPDATEPIXEL(PIXEL1, PIXEL2)\
-			SETCOLOR((*driver).CURRENT_DISP_IMAGE,PIXEL1 , PIXEL2, SHIFT);\
+#define UPDATEPIXEL(CURRENT_PIXEL)\
+		    SETCOLOR((*driver).CURRENT_DISP_IMAGE, (pixel_offset + CURRENT_PIXEL) , (512 + pixel_offset + CURRENT_PIXEL), SHIFT);\
 			SETCLK();\
 			CLRCLK()
 

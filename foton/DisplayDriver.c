@@ -36,6 +36,18 @@
 #include "LEDBoardGPIO.h"
 #include "fotonrgb.h"
 
+// define some alpha values
+
+static const float ALPHA_VALUES[]= {.055, .075,  .086, .187, .55};
+float ALPHA_DELAY_VALUE;
+
+
+void SETALPHA(unsigned int alpha)
+{
+	if(alpha <= 4)
+		ALPHA_DELAY_VALUE = ALPHA_VALUES[alpha];
+}
+
 /**********************************************************************
  *
  * the image displayed with this function, only uses rgb
@@ -125,12 +137,55 @@ void DisplayCurrentImageBCM2(void * d)
 {
 	DisplayDriver * driver = (DisplayDriver *)d;
 	int CURRENT_ROW=0;
-	int CURRENT_PIXEL = 0;
 	int SHIFT=0;
 	int pixel_offset= 0;
 	SETADDR((*driver).addr[CURRENT_ROW]);
 	while(1)
 	{
+
+
+		SETBLANK();
+
+		SETADDR((*driver).addr[CURRENT_ROW]);
+		SETLATCH();
+		//vTaskDelay(0.01);
+		vTaskDelay(0.0000000001 * ALPHA_DELAY_VALUE);
+		pixel_offset = CURRENT_ROW * 32;
+		UPDATEPIXEL(0);
+		UPDATEPIXEL(1);
+		UPDATEPIXEL(2);
+		UPDATEPIXEL(3);
+		UPDATEPIXEL(4);
+		UPDATEPIXEL(5);
+		UPDATEPIXEL(6);
+		UPDATEPIXEL(7);
+		UPDATEPIXEL(8);
+		UPDATEPIXEL(9);
+		UPDATEPIXEL(10);
+		UPDATEPIXEL(11);
+		UPDATEPIXEL(12);
+		UPDATEPIXEL(13);
+		UPDATEPIXEL(14);
+		UPDATEPIXEL(15);
+		UPDATEPIXEL(16);
+		UPDATEPIXEL(17);
+		UPDATEPIXEL(18);
+		UPDATEPIXEL(19);
+		UPDATEPIXEL(20);
+		UPDATEPIXEL(21);
+		UPDATEPIXEL(22);
+		UPDATEPIXEL(23);
+		UPDATEPIXEL(24);
+		UPDATEPIXEL(25);
+		UPDATEPIXEL(26);
+		UPDATEPIXEL(27);
+		UPDATEPIXEL(28);
+		UPDATEPIXEL(29);
+		UPDATEPIXEL(30);
+ 		UPDATEPIXEL(31);
+		CLRLATCH();
+		CLRBLANK();
+		vTaskDelay( (0.0000000001 * (float)(1 << SHIFT)) / ALPHA_DELAY_VALUE);
 
 		if(++SHIFT >= 8) // increment color phase
 		{
@@ -141,26 +196,6 @@ void DisplayCurrentImageBCM2(void * d)
 			}
 
 		}
-		SETBLANK();
-		SETADDR((*driver).addr[CURRENT_ROW]);
-		SETLATCH();
-		vTaskDelay(0.000000001);
-		pixel_offset = CURRENT_ROW * 32;
-		for(CURRENT_PIXEL = 0; CURRENT_PIXEL < 32; ++CURRENT_PIXEL)
-		{
-			//UPDATEPIXEL((32 * CURRENT_ROW + CURRENT_PIXEL), (512 + (32* CURRENT_ROW) + CURRENT_PIXEL));
-			SETCOLOR((*driver).CURRENT_DISP_IMAGE, (pixel_offset + CURRENT_PIXEL) , (512 + pixel_offset + CURRENT_PIXEL), SHIFT);
-			SETCLK();
-			CLRCLK();
-
-		}
-		CLRLATCH();
-
-		CLRBLANK();
-		vTaskDelay( 0.000000000000001 * (float)(1 << SHIFT));
-
-
-
 
 	}
 }

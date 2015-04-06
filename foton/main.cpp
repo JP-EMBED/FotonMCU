@@ -11,13 +11,15 @@
 // Driverlib includes
 #include <hw_memmap.h>
 #include <hw_common_reg.h>
-#include <hw_types.h>
-#include <hw_ints.h>
-#include <interrupt.h>
+#include "hw_types.h"
 #include <rom.h>
 #include <rom_map.h>
 #include <uart.h>
 #include <prcm.h>
+#include "sdhost.h"
+#include <ff.h>
+#include <hw_ints.h>
+#include <interrupt.h>
 #include <utils.h>
 #include <hw_uart.h>
 
@@ -38,7 +40,7 @@
 #include "LEDBoardGPIO.h"
 #include "DisplayDriver.h"
 #include "GenerateImage.h"
-
+#include "FotonFile.h"
 //*****************************************************************************
 //                          MACROS
 //*****************************************************************************
@@ -73,8 +75,9 @@ TaskHandle_t       DISP_IMG_HNDLE;
 ButtonDriver * Button1_PTR;
 ButtonDriver * Button2_PTR;
 
-static ButtonDriver button1(13);
-static ButtonDriver button2(22);
+//static ButtonDriver button1(32);
+//static ButtonDriver button2(2);
+//static ButtonDriver button3(63);
 /*
  * Bluetooth (HC-05)
  * Board Pin	Function	GPIO Pin Alias	Pin Mode Config	Peripheral Pin	Foton Alias
@@ -354,6 +357,9 @@ void initializeLEDBoardPins()
 }
 
 
+
+
+
 void main()
 {
     //
@@ -363,11 +369,13 @@ void main()
 	UDMAInit();
 	ConfigureDisplayDriver(&leddisplay);
 	// red, green, blue, start, end, driver
-	 FillColor(255,255,255,0,1024, &leddisplay);
+	 FillColor(0,0,0,0,1024, &leddisplay);
 	ConfigLEDPins();
+	// Alpha is set to lowest
+	SETALPHA(3);
 	//initializePWMClock();
     initializeLEDBoardPins();
-
+   // intitiatlizeSystemMemory();
     InitTerm();
 
     bluetooth.setLiveMode();
@@ -387,7 +395,7 @@ void main()
      //InitializeLEDs(); //Initialize LEDS (Cannot use LEDs until moved RX and TX Uart 1 from pin_01 and pin_02
 
     // Configure Button one
-    Button1_PTR = &button1;
+  /*  Button1_PTR = &button1;
     button1.configureInterrupt(&BUTTON_ISR,ButtonDriver::BOTH_EDGES);
     BUTTON_DEBOUNCE_CTRL  debounce;
     debounce.FIRE_MODE = BUTTON_ON_RELEASED;
@@ -403,9 +411,9 @@ void main()
     debounce.FIRE_MODE = BUTTON_ON_RELEASED;
     debounce.CTRL_DATA = 1;
     ButtonDriver::configureDebounce(2, debounce);
-    button2.enableInterrupt();
+    button2.enableInterrupt();*/
    //xTaskCreate( DisplayCurrentImageBCM, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
-    xTaskCreate( DisplayCurrentImageBCM2, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 2, &DISP_IMG_HNDLE);
+    xTaskCreate( DisplayCurrentImageBCM2, "DispCurImg",OSI_STACK_SIZE, FOTON_LED_BOARD, 1, &DISP_IMG_HNDLE);
    // xTaskCreate( BUTTON_DEBOUNCE_TASK, "B-Deb",OSI_STACK_SIZE, NULL, 2, &DEBOUNCE_TSK_HNDLE);
 
 

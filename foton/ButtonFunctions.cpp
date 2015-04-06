@@ -9,6 +9,8 @@
 #include "HC-05driver.h"
 #include "GenerateImage.h"
 
+
+
 //Pretend to be off
 void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state)
 {
@@ -18,7 +20,7 @@ void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state)
 		// Sleep Bluetooth
 		FOTON_BLUETOOTH->setPowerOn(0);
 		// Clear led screen
-		FillColor(0,0,0,0,1024, FOTON_LED_BOARD);
+		FillColor(0,0,0,0,1024, FOTON_LED_BOARD);// TODO Save off current grid
 		// Set mode to OFF
 	}
 	else // Turn off Standby
@@ -26,6 +28,7 @@ void StandbyMode(const ButtonSTATUS & button_data, const bool &button_state)
 		// Turn bluetooth on
 		FOTON_BLUETOOTH->setPowerOn(1);
 		// Set mode to default mode
+		// Load Saved Grid
 	}
 }
 
@@ -46,4 +49,17 @@ void BluetoothDisabled(const ButtonSTATUS & button_data, const bool &button_stat
 		FOTON_BLUETOOTH->setPowerOn(1);
 		// negate live mode disabled bit
 	}
+}
+
+
+void SwitchDisplayImageLeft(const ButtonSTATUS & button_data, const bool &button_state)
+{
+
+
+}
+
+void SwitchDisplayImageRight(const ButtonSTATUS & button_data, const bool &button_state)
+{
+
+
 }
