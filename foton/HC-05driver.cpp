@@ -84,7 +84,7 @@ void BlueToothInterruptHandler()
 	xYieldRequired = xTaskResumeFromISR(BLUETOOTH_READ_HNDLE);
 	portYIELD_FROM_ISR(xYieldRequired);
 	// Reconfigure DMA for next transfer
-	UDMASetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
+	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
 			       UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
 		           UDMA_SRC_INC_NONE,(RXDATABUFF + FOTON_BLUETOOTH->BackIndex),UDMA_DST_INC_8);
 
@@ -284,7 +284,7 @@ void HC_05Bluetooth::setLiveMode()
 	// Receive the Data
 	FrontIndex = 0;
 	BackIndex = 0;
-	UDMASetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
+	SetupTransfer(RX_DMA_CHANNEL, UDMA_MODE_BASIC,2,UDMA_SIZE_8,
 		           UDMA_ARB_2,(void *)(BLUETOOTH+UART_O_DR),
 		           UDMA_SRC_INC_NONE,RXDATABUFF,UDMA_DST_INC_8);
 

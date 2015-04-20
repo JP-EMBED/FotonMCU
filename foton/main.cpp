@@ -17,7 +17,7 @@
 #include <uart.h>
 #include <prcm.h>
 #include "sdhost.h"
-#include <ff.h>
+//#include <ff.h>
 #include <hw_ints.h>
 #include <interrupt.h>
 #include <utils.h>
@@ -372,7 +372,7 @@ void main()
 	 FillColor(0,0,0,0,1024, &leddisplay);
 	ConfigLEDPins();
 	// Alpha is set to lowest
-	SETALPHA(3);
+	SETALPHA(0);
 	//initializePWMClock();
     initializeLEDBoardPins();
    // intitiatlizeSystemMemory();
